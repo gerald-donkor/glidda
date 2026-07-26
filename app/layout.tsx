@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Archivo, Instrument_Sans, Martian_Mono } from "next/font/google";
+import { Instrument_Sans, Martian_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
 
-// Display. `weight` is omitted because `axes` is used — the variable font carries every weight,
-// and 600 is set in CSS. `wdth` is exposed so §6.2's wide signage width is real, not faked.
-const archivo = Archivo({
+// Display. `weight` is omitted because `axes` is used — the variable font carries the whole
+// 200–800 range, and 300 is set in CSS. `opsz` is exposed so the light strokes hold at hero size.
+const newsreader = Newsreader({
   subsets: ["latin"],
-  axes: ["wdth"],
+  axes: ["opsz"],
   variable: "--font-display-family",
   display: "swap",
 });
@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${instrumentSans.variable} ${martianMono.variable} h-full antialiased`}
+      className={`${newsreader.variable} ${instrumentSans.variable} ${martianMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>

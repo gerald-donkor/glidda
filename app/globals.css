@@ -19,27 +19,33 @@
   --color-rail-hairline: var(--rail-hairline);
   --color-rail-subtle: var(--rail-subtle);
 
+  /* Panel washes — the only place a route hue is ever painted. */
+  --color-wash-signal: var(--wash-signal);
+  --color-wash-cable: var(--wash-cable);
+  --color-wash-spruce: var(--wash-spruce);
+
   /* Faces — AGENTS.md §6.2 */
-  --font-display: var(--font-display-family), sans-serif;
+  --font-display: var(--font-display-family), ui-serif, Georgia, serif;
   --font-body: var(--font-body-family), ui-sans-serif, system-ui, sans-serif;
   --font-utility: var(--font-utility-family), ui-monospace, monospace;
   --font-sans: var(--font-body);
   --font-mono: var(--font-utility);
   --font-heading: var(--font-display);
 
-  /* Fluid type scale — AGENTS.md §6.2, 360px → 1440px */
-  --text-hero: clamp(2.75rem, 1.36rem + 6.19vw, 5.25rem);
-  --text-headline: clamp(1.875rem, 1.146rem + 3.24vw, 3.25rem);
-  --text-panel: clamp(1.375rem, 1.176rem + 0.88vw, 1.75rem);
-  --text-quote: clamp(1.375rem, 0.977rem + 1.77vw, 2.125rem);
-  --text-body: clamp(1rem, 0.967rem + 0.15vw, 1.0625rem);
+  /* Fluid type scale — AGENTS.md §6.2, 360px → 1440px. Two display steps only: --text-hero
+     for the one h1, --text-headline for every other headline on the page. */
+  --text-hero: clamp(2.5rem, 1.5rem + 4.44vw, 4.75rem);
+  --text-headline: clamp(1.625rem, 1.236rem + 1.73vw, 2.5rem);
+  --text-panel: clamp(1.25rem, 1.083rem + 0.74vw, 1.625rem);
+  --text-quote: clamp(1.375rem, 0.986rem + 1.73vw, 2.25rem);
+  --text-body: clamp(0.9375rem, 0.909rem + 0.12vw, 1rem);
   --text-small: 0.875rem;
   --text-eyebrow: 0.6875rem;
 
-  /* Radii — AGENTS.md §6.3. Nothing between 4 and 12. */
-  --radius-chip: 4px;
-  --radius-card: 12px;
-  --radius-panel: 20px;
+  /* Radii — AGENTS.md §6.3 */
+  --radius-chip: 6px;
+  --radius-card: 14px;
+  --radius-panel: 24px;
   --radius-pill: 999px;
 
   /* Spacing and shell — AGENTS.md §6.3 */
@@ -93,10 +99,10 @@
 
 :root {
   /* ── Brand tokens — AGENTS.md §6.1. The only place these values are written. ── */
-  --ink: #17191c;
-  --ground: #e9ebee;
-  --surface: #f7f8f9;
-  --rail: #8a94a0;
+  --ink: #101114;
+  --ground: #ffffff;
+  --surface: #f0f1ee;
+  --rail: #e4e5e3;
   --signal: #ffc531;
   --paper: #ffffff;
 
@@ -105,15 +111,24 @@
   --route-cable: #2f6be8;
   --route-spruce: #16736b;
 
-  /* Derived. --rail-muted mixes 60% toward --ink so muted text clears §12's 4.5:1 floor. */
-  --rail-hairline: color-mix(in oklab, var(--rail) 40%, transparent);
-  --rail-muted: color-mix(in oklab, var(--rail) 60%, var(--ink));
-  --rail-subtle: color-mix(in oklab, var(--rail) 30%, transparent);
-  --ask-shadow: 0 8px 32px -8px color-mix(in oklab, var(--ink) 18%, transparent);
+  /* Derived. --rail-muted is authored, not mixed: --rail is now the hairline tone, so mixing
+     from it lands nowhere useful. #5F6266 is 6.13:1 on --ground and 5.4:1 on --surface. */
+  --rail-muted: #5f6266;
+  --rail-hairline: var(--rail);
+  /* The secondary pill's hover fill. Stepped down from --surface toward --ink, not up from
+     --rail: mixing from --rail now resolves lighter than --surface and would invert the hover. */
+  --rail-subtle: color-mix(in oklab, var(--surface) 94%, var(--ink));
+
+  /* Panel washes — a route hue only ever reaches the page through one of these. */
+  --wash-signal: color-mix(in oklab, var(--route-signal) 34%, white);
+  --wash-cable: color-mix(in oklab, var(--route-cable) 22%, white);
+  --wash-spruce: color-mix(in oklab, var(--route-spruce) 24%, white);
+
+  --ask-shadow: 0 10px 40px -12px color-mix(in oklab, var(--ink) 14%, transparent);
 
   /* Layout primitives — AGENTS.md §6.3, §6.4 */
   --rail-inset: clamp(16px, 4vw, 64px);
-  --section-rhythm: clamp(96px, 12vw, 176px);
+  --section-rhythm: clamp(112px, 13vw, 200px);
   --gutter: clamp(16px, 4vw, 24px);
 
   /* Motion primitives — AGENTS.md §7.1. CSS-layer micro-interactions only; GSAP owns the rest. */
@@ -196,12 +211,13 @@
 
 /* ── Utilities. @utility, not @layer classes, so they compose with variants (§13). ── */
 
-/* Display face at its signage width. Never faked with transform: scaleX. */
+/* Display face. Light editorial serif, set large. Newsreader carries an `opsz` axis, so the
+   browser's default `font-optical-sizing: auto` handles large sizes — no manual variation
+   settings, and no width axis to set. Never used below --text-panel (§6.2). */
 @utility type-display {
   font-family: var(--font-display);
-  font-weight: 600;
-  font-variation-settings: "wdth" 115;
-  letter-spacing: -0.02em;
+  font-weight: 300;
+  letter-spacing: -0.01em;
 }
 
 /* The signage voice. Eyebrows, station labels, stat labels, data chips — nothing else. */
@@ -263,13 +279,12 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 600;
-    font-variation-settings: "wdth" 115;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1.06;
   }
 
   h1 {
-    line-height: 0.95;
+    line-height: 1.02;
   }
 }

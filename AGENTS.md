@@ -195,32 +195,38 @@ The recording ends without submitting a message, so the post-submit conversation
 
 If a prompt or a piece of generated copy would be recognisable as handhold.io with the name swapped, it is wrong. Glidda's identity is defined in section 6 and is deliberately different.
 
+**2026-07-26 — approved structural revision.** The user supplied a full-page screenshot of handhold.io and approved a "same feel, our own values" rewrite of section 6 (`prompts/02-design-system-revision.md`). What was taken is structural only: a white page with a single tinted surface tone, monochrome page chrome, colour confined to the inside of feature panels, a two-step display scale, low density, black pill buttons, faint hairlines. The "leave" list above is unchanged and still binding — none of their values, faces, artwork, or copy came across.
+
 ---
 
 # 6. Glidda design system
 
-The subject is a **guided line** — Glidda's product is a rail a user rides through software. Every design decision derives from that, and the reference's soft organic blobs are explicitly rejected in favour of engineered, directional forms: funicular and cable-car livery, signage, station markers, travel along a fixed track.
+The subject is a **guided line** — Glidda's product is a rail a user rides through software. Every design decision derives from that, and soft organic blobs are explicitly rejected in favour of engineered, directional forms: funicular and cable-car livery, signage, station markers, travel along a fixed track.
+
+The system's governing rule: **the page chrome is monochrome, and colour lives only inside feature panels.** No coloured button, link, rule, icon, or focus ring exists anywhere on the page. That restraint is what lets the layout carry as much whitespace as it does without looking empty.
 
 ## 6.1 Colour
 
-Six tokens. Define them as CSS custom properties in `app/globals.css` under the existing `@theme inline` block; never hardcode a hex in a component.
+Six tokens. Define them as CSS custom properties in `app/globals.css`; never hardcode a hex in a component.
 
 | Token | Hex | Role |
 | --- | --- | --- |
-| `--ink` | `#17191C` | Graphite. All text, the rail, all solid buttons. Not pure black. |
-| `--ground` | `#E9EBEE` | Zinc mist. Page background. Cool, **not** cream. |
-| `--surface` | `#F7F8F9` | Panels, cards, inset blocks. |
-| `--rail` | `#8A94A0` | Steel. Hairlines, the rail's inactive length, muted text at ≥60% only. |
-| `--signal` | `#FFC531` | Signal yellow. The active rail, progress underlines, the one accent. |
-| `--paper` | `#FFFFFF` | Inputs, floating chips, the Ask bar. |
+| `--ink` | `#101114` | All text, all solid buttons, the travelled length of the rail. Not pure black. |
+| `--ground` | `#FFFFFF` | The page. White. |
+| `--surface` | `#F0F1EE` | Panels, cards, the announcement bar, inset blocks. |
+| `--rail` | `#E4E5E3` | Hairlines and the rail's untravelled length. **Never text.** |
+| `--signal` | `#FFC531` | The Answers route wash. **Not a page accent.** Never text. |
+| `--paper` | `#FFFFFF` | Inputs, floating chips, the Ask bar — reads as white against a tinted panel. |
 
-Three **route hues** exist only inside feature panels — one per section, never on text, never on the rail, never two at once:
+Muted text uses `--rail-muted` (`#5F6266`) and nothing else — 6.13:1 on `--ground`, 5.41:1 on `--surface`. `--rail` is a hairline tone at 1.26:1 and may never carry text at any opacity.
 
-| Route | Hex | Section |
-| --- | --- | --- |
-| `--route-signal` | `#FFC531` | Answers |
-| `--route-cable` | `#2F6BE8` | Demos |
-| `--route-spruce` | `#16736B` | Onboarding |
+Three **route hues** exist only inside feature panels — one per section, never on text, never on the rail, never two at once. Each is painted through its wash, never at full strength:
+
+| Route | Hex | Wash | Section |
+| --- | --- | --- | --- |
+| `--route-signal` | `#FFC531` | `--wash-signal` — 34% in white | Answers |
+| `--route-cable` | `#2F6BE8` | `--wash-cable` — 22% in white | Demos |
+| `--route-spruce` | `#16736B` | `--wash-spruce` — 24% in white | Onboarding |
 
 Dark mode is **not in scope**. Do not add a dark theme until this file says to.
 
@@ -228,37 +234,37 @@ Dark mode is **not in scope**. Do not add a dark theme until this file says to.
 
 Three roles, loaded through `next/font/google` (read the fonts guide in `node_modules/next/dist/docs/` for the current API):
 
-- **Display — Archivo.** Variable, weight 600, tracking `-0.02em`, leading `0.95` at hero sizes. Engineered and signage-like, deliberately not a serif. If the width axis is exposed, set it wide (~115); if not, use tracking alone and do not fake it with `transform: scaleX`.
+- **Display — Newsreader.** Variable 200–800 with an `opsz` axis; weight 300, tracking `-0.01em`, leading `1.02` at hero size and `1.06` elsewhere. A light editorial serif set large — the size and the air do the work, not weight. Omit `weight` and pass `axes: ["opsz"]` so the browser's default optical sizing holds the thin strokes at 76px. Set no `font-variation-settings`; there is no width axis to set. **Never used below `--text-panel`** — a 300-weight serif is not a body face.
 - **Body — Instrument Sans.** Weights 400/500. All paragraphs, accordion rows, buttons, inputs.
 - **Utility — Martian Mono.** Weight 500, uppercase, tracking `0.12em`, 11–12px. Only for eyebrows, station labels, stat labels, and data chips. Its wide monospace is the "signage" voice — using it anywhere else dilutes it.
 
-Type scale (fluid via `clamp()`, mobile → desktop):
+Type scale (fluid via `clamp()`, 360 → 1440px). **Two display steps, not four** — collapsing the scale is most of what makes the page read as calm:
 
-| Role | Size | Face |
-| --- | --- | --- |
-| Hero | 44 → 84px | Display |
-| Section headline | 30 → 52px | Display |
-| Panel/card heading | 22 → 28px | Display |
-| Pull-quote | 22 → 34px | Display |
-| Body | 16 → 17px | Body |
-| Small / muted | 14px | Body |
-| Eyebrow / label | 11px | Utility |
+| Role | Token | Size | Face |
+| --- | --- | --- | --- |
+| Hero — the one `h1` | `--text-hero` | 40 → 76px | Display |
+| Section headline, feature headline, FAQ question, card heading | `--text-headline` | 26 → 40px | Display |
+| Small headings inside vignettes and capability cards | `--text-panel` | 20 → 26px | Display |
+| Pull-quote | `--text-quote` | 22 → 36px | Display |
+| Body | `--text-body` | 15 → 16px | Body |
+| Small / muted | `--text-small` | 14px | Body |
+| Eyebrow / label | `--text-eyebrow` | 11px | Utility |
 
-Sentence case everywhere except Utility-face labels, which are uppercase.
+Hierarchy is carried by the gap between a 26–40px headline and 15–16px body copy. Never by weight, never by colour. Sentence case everywhere except Utility-face labels, which are uppercase.
 
 ## 6.3 Spacing, shape, and texture
 
-- 4px base scale. Section vertical rhythm: `clamp(96px, 12vw, 176px)`.
+- 4px base scale. Section vertical rhythm: `clamp(112px, 13vw, 200px)`.
 - Content max-width 1200px, 24px gutters, 16px on mobile.
-- Radii: `4px` inputs and chips, `12px` cards, `20px` large panels, `999px` buttons. Nothing between 4 and 12.
-- Hairlines are always `1px solid var(--rail)` at 40% opacity. No box shadows anywhere except the Ask bar, which gets exactly one soft shadow to lift it off the page.
-- **Texture — the slipstream.** Where the reference uses morphing blobs, Glidda uses long parallel streaks of the route hue, sheared ~12°, with an SVG `feTurbulence` grain overlay at low opacity. It must read as motion *along a line*, not as a lava lamp. One implementation, one component, reused with a hue prop.
+- Radii: `6px` inputs and chips, `14px` cards, `24px` large panels, `999px` buttons. Those four values only.
+- Hairlines are always `1px solid var(--rail)` at full opacity — the tone is already faint by design. They separate; they do not decorate. No box shadows anywhere except the Ask bar, which gets exactly one soft shadow to lift it off the page.
+- **Texture — the slipstream.** Where the reference uses morphing blobs, Glidda uses long parallel streaks of the route wash, sheared ~12°, with an SVG `feTurbulence` grain overlay at low opacity. It must read as motion *along a line*, not as a lava lamp. One implementation, one component, reused with a hue prop.
 
 ## 6.4 Signature element — the Rail
 
 A single continuous 1px vertical line, inset from the left content edge, that enters at the hero and runs the full length of the page. It carries **station markers** at each section: a small square node on the line plus a Utility-face label.
 
-- Scroll progress paints the rail from `--rail` to `--signal` behind the viewport's midpoint, so the travelled portion is visibly behind you. Bind it to `ScrollTrigger` scrub, transform/opacity only.
+- Scroll progress paints the rail from `--rail` to `--ink` behind the viewport's midpoint, so the travelled portion is visibly behind you. Signal yellow no longer paints it — the rail is part of the page chrome, and the chrome is monochrome (§6). Bind it to `ScrollTrigger` scrub, transform/opacity only.
 - Section headlines hang off the rail — they align to it, they do not merely sit near it.
 - Feature panels translate a short distance along the rail as their section passes, so they read as carried by it.
 - Numbered steps are stations on the route. **This is the only place numbering is allowed** — it encodes a real ordered sequence. Do not add `01 / 02 / 03` decoration anywhere else.
@@ -466,7 +472,7 @@ Meet this without announcing it in the UI:
 - Full keyboard operation: accordions, FAQ, carousel, Ask bar, chips.
 - Semantic headings in order. One `h1` — the hero.
 - `prefers-reduced-motion` respected per section 7.2.
-- Text contrast ≥ 4.5:1. `--rail` as text colour only at 60%+ opacity on `--ground`, and never for body copy.
+- Text contrast ≥ 4.5:1. Muted text is `--rail-muted` and nothing else; `--rail` and `--signal` never carry text at any opacity. The display face never carries body copy (§6.2).
 - Decorative visuals — slipstream, rail, vignettes — are `aria-hidden`. Anything conveying real information is not.
 - Images through `next/image` with explicit dimensions. Fonts through `next/font`. No layout shift on load.
 - The page must be readable and navigable with JavaScript disabled, minus the animation.
@@ -478,6 +484,7 @@ Meet this without announcing it in the UI:
 - TypeScript. No `any`. Explicit props types, no implicit `React.FC`.
 - Small components, small functions. If a section file passes ~200 lines, extract a subcomponent.
 - Centralise magic numbers — durations, breakpoints, the rail inset — in `lib/gsap/` or as CSS custom properties. Never repeat a duration literal.
+- **The type scale is registered with tailwind-merge in `lib/utils.ts`.** `text-body` and `text-ink` are indistinguishable to tailwind-merge without it, so `cn()` silently drops the colour when a size and a colour meet on one element. Any new `--text-*` token must be added to that list in the same commit.
 - **CSS specificity:** Tailwind utilities in the markup are the default. When a component needs custom CSS, scope it and keep specificity flat — do not write a type-level selector (`.section`) and an element-level one (`.cta`) that fight over the same padding. Section spacing lives on the section element only; children never set their own outer margins.
 - No unrelated refactors, no unrequested features, no dead code, no commented-out blocks.
 - Safe error handling on anything async. No swallowed promises.

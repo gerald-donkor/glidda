@@ -2,28 +2,13 @@ import type { Metadata } from "next";
 
 import { Button } from "@/components/ui/button";
 
+import { Swatch } from "./swatch";
+import { WashSwatch } from "./wash-swatch";
+
 export const metadata: Metadata = {
   title: "Glidda design system",
   robots: { index: false },
 };
-
-type SwatchProps = {
-  token: string;
-  fill: string;
-  contrast?: string;
-  note?: string;
-};
-
-function Swatch({ token, fill, contrast, note }: SwatchProps) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className={`h-20 w-full rounded-card hairline ${fill}`} />
-      <p className="type-utility text-ink">{token}</p>
-      {contrast ? <p className="text-small text-rail-muted">{contrast}</p> : null}
-      {note ? <p className="text-small text-rail-muted">{note}</p> : null}
-    </div>
-  );
-}
 
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -48,23 +33,33 @@ export default function DesignSystemPage() {
 
       <Group title="Core colour">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
-          <Swatch token="--ink" fill="bg-ink" contrast="14.75:1 on ground" note="Text, rail, solid buttons" />
-          <Swatch token="--ground" fill="bg-ground" note="Page background" />
-          <Swatch token="--surface" fill="bg-surface" note="Panels, cards, inset blocks" />
-          <Swatch token="--rail" fill="bg-rail" contrast="2.58:1 — never text" note="Hairlines, inactive rail" />
-          <Swatch token="--signal" fill="bg-signal" contrast="1.32:1 — never text" note="Surface and rail accent only" />
-          <Swatch token="--paper" fill="bg-paper" note="Inputs, chips, the Ask bar" />
+          <Swatch token="--ink" fill="bg-ink" contrast="18.88:1 on ground" note="Text, the travelled rail, solid buttons" />
+          <Swatch token="--ground" fill="bg-ground" note="The page. White." />
+          <Swatch token="--surface" fill="bg-surface" note="Panels, cards, announce bar, inset blocks" />
+          <Swatch token="--rail" fill="bg-rail" contrast="1.26:1 — never text" note="Hairlines, the untravelled rail" />
+          <Swatch token="--signal" fill="bg-signal" contrast="1.58:1 — never text" note="The Answers wash. Not a page accent." />
+          <Swatch token="--paper" fill="bg-paper" note="Inputs, chips, the Ask bar — white on a tinted panel" />
         </div>
+        <p className="text-body text-rail-muted max-w-prose">
+          The page chrome is monochrome. No button, link, rule, or focus ring carries a hue —
+          colour appears only inside a feature panel, as one of the three washes below.
+        </p>
       </Group>
 
-      <Group title="Route hues">
+      <Group title="Route hues and washes">
         <p className="text-body text-rail-muted max-w-prose">
-          Feature panels only. Never on text, never on the rail, never two at once.
+          Feature panels only. Never on text, never on the rail, never two at once. The hue is the
+          source; the wash is what actually gets painted.
         </p>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <Swatch token="--route-signal" fill="bg-route-signal" note="Answers" />
-          <Swatch token="--route-cable" fill="bg-route-cable" note="Demos" />
-          <Swatch token="--route-spruce" fill="bg-route-spruce" note="Onboarding" />
+          <Swatch token="--route-cable" fill="bg-route-cable" contrast="4.78:1 — panels only" note="Demos" />
+          <Swatch token="--route-spruce" fill="bg-route-spruce" contrast="5.68:1 — panels only" note="Onboarding" />
+        </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <WashSwatch token="--wash-signal" fill="bg-wash-signal" />
+          <WashSwatch token="--wash-cable" fill="bg-wash-cable" />
+          <WashSwatch token="--wash-spruce" fill="bg-wash-spruce" />
         </div>
       </Group>
 
@@ -73,11 +68,15 @@ export default function DesignSystemPage() {
           <Swatch
             token="--rail-muted"
             fill="bg-rail-muted"
-            contrast="5.41:1 on ground"
+            contrast="6.13:1 on ground · 5.4:1 on surface"
             note="The only token permitted for muted body text"
           />
-          <Swatch token="--rail-hairline" fill="bg-rail-hairline" note="Every hairline (rail at 40%)" />
-          <Swatch token="--rail-subtle" fill="bg-rail-subtle" note="Secondary pill hover fill" />
+          <Swatch token="--rail-hairline" fill="bg-rail-hairline" note="Every hairline. The tone is the hairline — no mix." />
+          <Swatch
+            token="--rail-subtle"
+            fill="bg-rail-subtle"
+            note="Secondary pill hover fill — surface stepped toward ink, so hover darkens"
+          />
         </div>
         <p className="text-body text-rail-muted max-w-prose">
           Muted body copy renders in <span className="text-ink">--rail-muted</span>, not raw
@@ -86,31 +85,41 @@ export default function DesignSystemPage() {
       </Group>
 
       <Group title="Type scale">
+        <p className="text-body text-rail-muted max-w-prose">
+          Two display steps, not four. --text-headline carries section headlines, feature
+          headlines, FAQ questions, and card headings alike; the gap between it and 15–16px body
+          copy is what carries hierarchy, without weight or colour doing any work.
+        </p>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <p className="type-utility text-rail-muted">--text-hero · Archivo 600 · 44 → 84px</p>
+            <p className="type-utility text-rail-muted">--text-hero · Newsreader 300 · 40 → 76px</p>
             <p className="type-display text-hero">Ride the rail</p>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="type-utility text-rail-muted">--text-headline · Archivo 600 · 30 → 52px</p>
+            <p className="type-utility text-rail-muted">--text-headline · Newsreader 300 · 26 → 40px</p>
             <p className="type-display text-headline">A guide that knows your product</p>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="type-utility text-rail-muted">--text-panel · Archivo 600 · 22 → 28px</p>
+            <p className="type-utility text-rail-muted">--text-headline · the same step, as a FAQ question</p>
+            <p className="type-display text-headline">How long does a guide take to set up?</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <p className="type-utility text-rail-muted">--text-panel · Newsreader 300 · 20 → 26px</p>
             <p className="type-display text-panel">Runs demo sessions</p>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="type-utility text-rail-muted">--text-quote · Archivo 600 · 22 → 34px</p>
+            <p className="type-utility text-rail-muted">--text-quote · Newsreader 300 · 22 → 36px</p>
             <p className="type-display text-quote max-w-prose">
               A pull-quote sits at this size, and it is set in the display face so it reads as a
               statement rather than as body copy.
             </p>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="type-utility text-rail-muted">--text-body · Instrument Sans 400 · 16 → 17px</p>
+            <p className="type-utility text-rail-muted">--text-body · Instrument Sans 400 · 15 → 16px</p>
             <p className="text-body max-w-prose">
               Body copy carries the argument. It stays in the body face at every size, and it never
-              borrows the display face for emphasis.
+              borrows the display face for emphasis — a 300-weight serif at 15px is a legibility
+              risk, so Newsreader is permitted at --text-panel and above only.
             </p>
           </div>
           <div className="flex flex-col gap-2">
@@ -128,15 +137,15 @@ export default function DesignSystemPage() {
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           <div className="flex flex-col gap-2">
             <div className="h-20 rounded-chip hairline bg-surface" />
-            <p className="type-utility text-ink">--radius-chip · 4px</p>
+            <p className="type-utility text-ink">--radius-chip · 6px</p>
           </div>
           <div className="flex flex-col gap-2">
             <div className="h-20 rounded-card hairline bg-surface" />
-            <p className="type-utility text-ink">--radius-card · 12px</p>
+            <p className="type-utility text-ink">--radius-card · 14px</p>
           </div>
           <div className="flex flex-col gap-2">
             <div className="h-20 rounded-panel hairline bg-surface" />
-            <p className="type-utility text-ink">--radius-panel · 20px</p>
+            <p className="type-utility text-ink">--radius-panel · 24px</p>
           </div>
           <div className="flex flex-col gap-2">
             <div className="h-20 rounded-pill hairline bg-surface" />

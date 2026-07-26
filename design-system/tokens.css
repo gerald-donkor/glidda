@@ -9,11 +9,11 @@
  */
 
 :root {
-  /* Colour — §6.1 */
-  --ink: #17191c;
-  --ground: #e9ebee;
-  --surface: #f7f8f9;
-  --rail: #8a94a0;
+  /* Colour — §6.1. The page is white; the panels are the tinted surface. */
+  --ink: #101114;
+  --ground: #ffffff;
+  --surface: #f0f1ee;
+  --rail: #e4e5e3;
   --signal: #ffc531;
   --paper: #ffffff;
 
@@ -23,29 +23,35 @@
   --route-spruce: #16736b;
 
   /* Derived */
-  --rail-hairline: color-mix(in oklab, var(--rail) 40%, transparent);
-  --rail-muted: color-mix(in oklab, var(--rail) 60%, var(--ink));
-  --rail-subtle: color-mix(in oklab, var(--rail) 30%, transparent);
-  --ask-shadow: 0 8px 32px -8px color-mix(in oklab, var(--ink) 18%, transparent);
+  --rail-muted: #5f6266;
+  --rail-hairline: var(--rail);
+  --rail-subtle: color-mix(in oklab, var(--surface) 94%, var(--ink));
 
-  /* Type scale — §6.2, fluid 360 → 1440 */
-  --text-hero: clamp(2.75rem, 1.36rem + 6.19vw, 5.25rem);
-  --text-headline: clamp(1.875rem, 1.146rem + 3.24vw, 3.25rem);
-  --text-panel: clamp(1.375rem, 1.176rem + 0.88vw, 1.75rem);
-  --text-quote: clamp(1.375rem, 0.977rem + 1.77vw, 2.125rem);
-  --text-body: clamp(1rem, 0.967rem + 0.15vw, 1.0625rem);
+  /* Panel washes — the painted form of a route hue */
+  --wash-signal: color-mix(in oklab, var(--route-signal) 34%, white);
+  --wash-cable: color-mix(in oklab, var(--route-cable) 22%, white);
+  --wash-spruce: color-mix(in oklab, var(--route-spruce) 24%, white);
+
+  --ask-shadow: 0 10px 40px -12px color-mix(in oklab, var(--ink) 14%, transparent);
+
+  /* Type scale — §6.2, fluid 360 → 1440. Two display steps. */
+  --text-hero: clamp(2.5rem, 1.5rem + 4.44vw, 4.75rem);
+  --text-headline: clamp(1.625rem, 1.236rem + 1.73vw, 2.5rem);
+  --text-panel: clamp(1.25rem, 1.083rem + 0.74vw, 1.625rem);
+  --text-quote: clamp(1.375rem, 0.986rem + 1.73vw, 2.25rem);
+  --text-body: clamp(0.9375rem, 0.909rem + 0.12vw, 1rem);
   --text-small: 0.875rem;
   --text-eyebrow: 0.6875rem;
 
   /* Shape — §6.3 */
-  --radius-chip: 4px;
-  --radius-card: 12px;
-  --radius-panel: 20px;
+  --radius-chip: 6px;
+  --radius-card: 14px;
+  --radius-panel: 24px;
   --radius-pill: 999px;
 
   /* Layout — §6.3, §6.4 */
   --rail-inset: clamp(16px, 4vw, 64px);
-  --section-rhythm: clamp(96px, 12vw, 176px);
+  --section-rhythm: clamp(112px, 13vw, 200px);
   --gutter: clamp(16px, 4vw, 24px);
   --container-content: 1200px;
 
