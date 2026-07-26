@@ -22,6 +22,8 @@ export const hero: {
     // The same label as the header's pill, on purpose: the action keeps its name through the
     // whole flow (§11).
     primary: { label: "Start a guide", href: "#ask" },
-    secondary: { label: "See it run", href: "#demos" },
+    // The live demo panel is literally the thing this phrase describes, so it points there
+    // rather than at the Demos capability section.
+    secondary: { label: "See it run", href: "#live-demo" },
   },
 }
