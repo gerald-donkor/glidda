@@ -143,6 +143,11 @@
   /* The online dot is chrome, and the chrome is monochrome (§6) — see prompt 03, decision 8. */
   --dot-online: var(--ink);
 
+  /* The slipstream (§6.3). Geometry and grain live here; the hue mapping is the four
+     `.slipstream[data-route]` rules below, so no colour value ever appears in TSX. */
+  --slipstream-shear: -12deg;
+  --slipstream-grain-opacity: 0.14;
+
   /* Motion primitives — AGENTS.md §7.1. CSS-layer micro-interactions only; GSAP owns the rest. */
   --duration-micro: 200ms;
   --duration-entrance: 600ms;
@@ -358,6 +363,105 @@
   padding-bottom: calc(
     var(--ask-bar-height) + var(--gutter) * 2 + env(safe-area-inset-bottom, 0px)
   );
+}
+
+/* ── The slipstream (§6.3). Long parallel streaks, sheared, drifting along their own axis,
+   under a static grain. Not blobs: the form has to read as motion along a line, like the Rail.
+   One implementation, reused with a route prop. ── */
+
+/* The clipping box. `isolation` keeps the grain's multiply blend inside the slipstream so it
+   never composites against the page behind it. The element is absolute, so its consumer must
+   supply a positioned, overflow-clipped box. */
+@utility slipstream {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+/* The shear. A static CSS `rotate` — GSAP only ever touches xPercent on the layers, so the two
+   never write the same transform. Rotating (not skewing) keeps every streak's thickness even.
+   The frame is oversized so the rotated rectangle's corners never pull inside the clip box. */
+@utility slipstream-shear {
+  position: absolute;
+  inset: -25%;
+  rotate: var(--slipstream-shear);
+}
+
+/* One drifting layer. Holds its streaks twice at 200% width, so xPercent 0 → -50 puts the second
+   copy exactly where the first started and the loop has no seam. */
+@utility slipstream-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: 200%;
+  will-change: transform;
+}
+
+/* One of the two identical copies inside a layer. */
+@utility slipstream-half {
+  position: relative;
+  flex: 0 0 50%;
+}
+
+/* A streak. It fades out at both ends through the edge tone, so no streak ever terminates in a
+   hard vertical edge against a panel's rounded corner. Thickness and vertical position come from
+   the fixed array in slipstream.tsx via --streak-h / --streak-top. */
+@utility slipstream-streak {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--streak-top);
+  height: var(--streak-h);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--slipstream-edge) 16%,
+    var(--slipstream-wash) 44%,
+    var(--slipstream-wash) 56%,
+    var(--slipstream-edge) 84%,
+    transparent
+  );
+}
+
+/* The grain (§6.3). One feTurbulence, rasterised once into a repeating 180px tile, painted as a
+   static overlay — not `filter: url()` on the moving layers, which would re-run turbulence on a
+   full-bleed element every frame. The streaks sliding under it are what makes it read as moving.
+   The filter id lives inside the data URI's own document, so five instances cannot collide. */
+@utility slipstream-grain {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply;
+  opacity: var(--slipstream-grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+@layer components {
+  /* The only place the slipstream meets a hue (§6.1, §13). Scoped to the component so
+     `data-route` never becomes a global attribute hook. `mono` is the page-chrome variant —
+     the hero and the live demo panel — because colour lives only inside feature panels. */
+  .slipstream[data-route="mono"] {
+    --slipstream-wash: var(--surface);
+    --slipstream-edge: var(--rail);
+  }
+
+  .slipstream[data-route="signal"] {
+    --slipstream-wash: var(--wash-signal);
+    --slipstream-edge: var(--ground);
+  }
+
+  .slipstream[data-route="cable"] {
+    --slipstream-wash: var(--wash-cable);
+    --slipstream-edge: var(--ground);
+  }
+
+  .slipstream[data-route="spruce"] {
+    --slipstream-wash: var(--wash-spruce);
+    --slipstream-edge: var(--ground);
+  }
 }
 
 @layer base {

@@ -22,6 +22,18 @@ export const EASE = {
 export const STAGGER = 0.06
 
 /**
+ * The slipstream's three drifting layers (§6.3, §7.1). One xPercent tween per layer.
+ */
+export const SLIPSTREAM = {
+  /**
+   * Three layer periods, seconds. Deliberately not multiples of each other, so the layers only
+   * re-align every few minutes and the texture never visibly repeats. Inside §7.1's 8–20s
+   * ambient window.
+   */
+  durations: [20, 15.5, 11],
+} as const
+
+/**
  * Ask-bar typewriter timings, in seconds. One question costs
  * TYPE_SPEED×len + HOLD + DELETE_SPEED×len + PAUSE; three questions of ~25 characters land
  * the full cycle inside §7.1's 8–20s ambient window.
