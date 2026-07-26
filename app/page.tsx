@@ -1,17 +1,23 @@
 import { RailStation } from "@/components/layout/rail-station"
 import { Hero } from "@/components/sections/hero"
+import { LogoBand } from "@/components/sections/logo-band"
+import { ProofBand } from "@/components/sections/proof-band"
 
 /**
  * Composition only (§9).
  *
- * The three sections below the hero are **stubs**. They exist so the Rail has a page to span and
- * the Ask bar has a page to scroll past; each is deleted outright as its real section lands. The
- * remaining sections of §8 arrive in prompts 06 and up.
+ * The three `answers` / `demos` / `faq` sections below are still **stubs**. They exist so the Rail
+ * has a page to span and the Ask bar has a page to scroll past; each is deleted outright as its
+ * real section lands. Outstanding from §8: the live demo panel, the section intro, the three
+ * capability sections, the Route, the generator and capability cards, the testimonial carousel,
+ * the real FAQ, and the closing CTA.
  */
 export default function Home() {
   return (
     <>
       <Hero />
+      <LogoBand />
+      <ProofBand />
 
       {/* TODO(prompt 06+): replaced by the Answers capability section. */}
       <section id="answers" className="section-rhythm anchor-offset">

@@ -50,6 +50,7 @@
 
   /* Spacing and shell — AGENTS.md §6.3 */
   --spacing-rhythm: var(--section-rhythm);
+  --spacing-rhythm-tight: var(--section-rhythm-tight);
   --spacing-gutter: var(--gutter);
   --container-content: 1200px;
 
@@ -128,6 +129,10 @@
 
   /* Layout primitives — AGENTS.md §6.3, §6.4 */
   --section-rhythm: clamp(112px, 13vw, 200px);
+  /* A tighter band for sections that read as a continuation of the one above rather than as a new
+     arrival — the logo band sits directly under the hero's slipstream. Roughly 0.6 of
+     --section-rhythm at both ends of its range. */
+  --section-rhythm-tight: clamp(72px, 8vw, 120px);
   --gutter: clamp(16px, 4vw, 24px);
 
   /* Rail geometry (§6.4). --rail-x is the distance from the content shell's outer edge to the
@@ -289,6 +294,11 @@
 /* Section spacing lives on the section element only; children never set outer margins (§13). */
 @utility section-rhythm {
   padding-block: var(--section-rhythm);
+}
+
+/* For a section that continues the one above it rather than arriving as a new place. */
+@utility section-rhythm-tight {
+  padding-block: var(--section-rhythm-tight);
 }
 
 /* ── The Rail (§6.4). Geometry lives here so no TSX file carries an arbitrary value. ── */
