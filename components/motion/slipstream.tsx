@@ -6,8 +6,16 @@ import { EASE, SLIPSTREAM } from "@/lib/gsap/motion"
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap/register"
 import { cn } from "@/lib/utils"
 
-/** Which hue the streaks are painted in. `mono` is the page-chrome variant (§6). */
-export type SlipstreamRoute = "mono" | "signal" | "cable" | "spruce"
+/**
+ * Which hue the streaks are painted in. `mono` is the page-chrome variant (§6); `mono-signal` is
+ * that field with its slowest layer warmed by a diluted signal wash, for the hero.
+ */
+export type SlipstreamRoute =
+  | "mono"
+  | "mono-signal"
+  | "signal"
+  | "cable"
+  | "spruce"
 
 /** `band` is the wide shallow treatment behind a CTA row; `panel` fills a ~1:1 feature panel. */
 export type SlipstreamDensity = "band" | "panel"
@@ -69,6 +77,9 @@ const STREAKS: Record<SlipstreamDensity, readonly (readonly Streak[])[]> = {
 
 /** Each layer is rendered twice inside itself; -50% puts copy two exactly where copy one was. */
 const COPIES = [0, 1]
+
+/** Layer 0 is the slowest and thickest — the one an accent tone rides. */
+const ACCENT_LAYER = 0
 
 /**
  * The slipstream (§6.3) — the one texture component in the system.
@@ -175,7 +186,12 @@ export function Slipstream({
                 {streaks.map((streak, streakIndex) => (
                   <span
                     key={streakIndex}
-                    className="slipstream-streak"
+                    className={cn(
+                      "slipstream-streak",
+                      // The accent rides the slowest layer, so it reads as a deep undertone
+                      // rather than a flicker. On single-toned routes it resolves to the wash.
+                      layerIndex === ACCENT_LAYER && "slipstream-streak-accent"
+                    )}
                     style={
                       {
                         "--streak-h": `${streak.h}px`,

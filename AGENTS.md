@@ -228,6 +228,14 @@ Three **route hues** exist only inside feature panels — one per section, never
 | `--route-cable` | `#2F6BE8` | `--wash-cable` — 22% in white | Demos |
 | `--route-spruce` | `#16736B` | `--wash-spruce` — 24% in white | Onboarding |
 
+**Stated exception — the hero slipstream (2026-07-26, approved).** The hero uses the slipstream's
+`mono-signal` route: a monochrome field whose slowest of three layers carries `--wash-signal` at
+60%, with the other two in `--surface`. This is the only place a route hue appears outside a
+feature panel. It exists because a wholly monochrome hero reads as bare paper, and it is diluted
+and confined to one layer so the Answers panel is still where signal arrives at full strength.
+Everything else in this section holds: no coloured button, link, rule, icon, focus ring, or text
+anywhere, and the rail stays monochrome.
+
 Dark mode is **not in scope**. Do not add a dark theme until this file says to.
 
 ## 6.2 Typography

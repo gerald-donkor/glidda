@@ -425,6 +425,20 @@
   );
 }
 
+/* The slowest layer, when a route carries an accent. Identical geometry; only the tone differs,
+   so the accent still reads as one of the parallel streaks rather than as a second effect. */
+@utility slipstream-streak-accent {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--slipstream-edge) 16%,
+    var(--slipstream-accent) 44%,
+    var(--slipstream-accent) 56%,
+    var(--slipstream-edge) 84%,
+    transparent
+  );
+}
+
 /* The grain (§6.3). One feTurbulence, rasterised once into a repeating 180px tile, painted as a
    static overlay — not `filter: url()` on the moving layers, which would re-run turbulence on a
    full-bleed element every frame. The streaks sliding under it are what makes it read as moving.
@@ -440,12 +454,31 @@
 }
 
 @layer components {
+  /* The accent tone, used by the slowest layer only, defaulting to the field's own wash so a
+     route is single-toned unless its rule says otherwise. This default has to live in the same
+     cascade layer as the route rules below: `@utility` emits into the utilities layer, which
+     wins over components regardless of specificity, so a default declared there would beat every
+     route override and silently grey the accent out. */
+  .slipstream {
+    --slipstream-accent: var(--slipstream-wash);
+  }
+
   /* The only place the slipstream meets a hue (§6.1, §13). Scoped to the component so
      `data-route` never becomes a global attribute hook. `mono` is the page-chrome variant —
      the hero and the live demo panel — because colour lives only inside feature panels. */
   .slipstream[data-route="mono"] {
     --slipstream-wash: var(--surface);
     --slipstream-edge: var(--rail);
+  }
+
+  /* The hero and the live demo panel. A monochrome field whose slowest layer carries a diluted
+     signal wash — enough warmth to keep the hero from reading as bare paper, well short of the
+     saturation the Answers panel opens with, so the hue still means something when it arrives.
+     A documented exception to §6.1's "colour lives only inside feature panels". */
+  .slipstream[data-route="mono-signal"] {
+    --slipstream-wash: var(--surface);
+    --slipstream-edge: var(--rail);
+    --slipstream-accent: color-mix(in oklab, var(--wash-signal) 60%, transparent);
   }
 
   .slipstream[data-route="signal"] {

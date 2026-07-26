@@ -192,15 +192,27 @@ export default function DesignSystemPage() {
         <p className="text-body text-rail-muted max-w-prose">
           The one texture in the system: parallel streaks sheared -12°, drifting along their own
           axis under a static grain — motion along a line, the same idea as the rail, never blobs.
-          The hero and the live demo panel use the <span className="text-ink">mono</span> variant
-          on purpose: the page chrome is monochrome, so the first coloured surface on the page is
-          the Answers panel, where the hue means something.
+          The hero uses <span className="text-ink">mono-signal</span>: a monochrome field whose
+          slowest layer carries a diluted signal wash. The hero gets warmth, and the Answers panel
+          is still where the hue arrives at full strength and starts meaning something.
         </p>
 
         <div className="flex flex-col gap-3">
           <p className="type-utility text-rail-muted">mono · band · the hero&apos;s arrangement</p>
           <div className="relative flex h-50 flex-col items-center justify-center gap-4 overflow-hidden rounded-panel">
             <Slipstream route="mono" density="band" />
+            <p className="type-display text-headline relative text-center">
+              A guide that rides with them
+            </p>
+            <Button variant="pill" size="pill" className="relative">
+              Start a guide
+            </Button>
+          </div>
+          <p className="type-utility text-rail-muted">
+            mono-signal · band · the hero, warmed
+          </p>
+          <div className="relative flex h-50 flex-col items-center justify-center gap-4 overflow-hidden rounded-panel">
+            <Slipstream route="mono-signal" density="band" />
             <p className="type-display text-headline relative text-center">
               A guide that rides with them
             </p>
