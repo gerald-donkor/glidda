@@ -34,6 +34,23 @@ export const SLIPSTREAM = {
 } as const
 
 /**
+ * The hero load (§7.3 #1). One budget, in seconds, shared by the hero's timeline and the Rail's
+ * entrance so the two read as one moment. Total 1.10s, inside §7.3's 1.2s.
+ */
+export const HERO = {
+  /** One viewport of cover retreating, from t=0. */
+  railDraw: 0.7,
+  /** The first headline line starts here; the second at +STAGGER. */
+  lines: 0.2,
+  sub: 0.38,
+  ctas: 0.44,
+  /** + DURATION.entrance = 1.10s. */
+  band: 0.5,
+  /** px, the entrance's y offset. Dropped to 0 in the reduced-motion branch (§7.2). */
+  rise: 24,
+} as const
+
+/**
  * Ask-bar typewriter timings, in seconds. One question costs
  * TYPE_SPEED×len + HOLD + DELETE_SPEED×len + PAUSE; three questions of ~25 characters land
  * the full cycle inside §7.1's 8–20s ambient window.

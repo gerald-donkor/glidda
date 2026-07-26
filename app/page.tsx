@@ -1,28 +1,19 @@
 import { RailStation } from "@/components/layout/rail-station"
+import { Hero } from "@/components/sections/hero"
 
 /**
  * Composition only (§9).
  *
- * The three sections below are **stubs**. They exist so the Rail has a page to span and the Ask
- * bar has a page to scroll past; each is deleted outright as its real section lands. The real
- * fourteen sections of §8 arrive in prompts 04 and up.
+ * The three sections below the hero are **stubs**. They exist so the Rail has a page to span and
+ * the Ask bar has a page to scroll past; each is deleted outright as its real section lands. The
+ * remaining sections of §8 arrive in prompts 06 and up.
  */
 export default function Home() {
   return (
     <>
-      {/* TODO(prompt 04): replaced by the real hero, which owns the page's one h1. */}
-      <section className="section-rhythm anchor-offset">
-        <div className="rail-offset relative">
-          <RailStation label="Start" />
-          <h1 className="text-hero">A guide that walks people through your product.</h1>
-          <p className="mt-6 max-w-prose text-body text-rail-muted">
-            Glidda answers questions in-page, runs a live demo of your real interface, and
-            gets new users to their first result — in any language, at any hour.
-          </p>
-        </div>
-      </section>
+      <Hero />
 
-      {/* TODO(prompt 05+): replaced by the Answers capability section. */}
+      {/* TODO(prompt 06+): replaced by the Answers capability section. */}
       <section id="answers" className="section-rhythm anchor-offset">
         <div className="rail-offset relative">
           <RailStation label="Answers" />
@@ -34,7 +25,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TODO(prompt 05+): replaced by the Demos capability section. */}
+      {/* TODO(prompt 06+): replaced by the Demos capability section. */}
       <section id="demos" className="section-rhythm anchor-offset">
         <div className="rail-offset relative">
           <RailStation label="Demos" />
@@ -46,7 +37,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TODO(prompt 06+): replaced by the real FAQ section. */}
+      {/* TODO(prompt 07+): replaced by the real FAQ section. */}
       <section id="faq" className="section-rhythm anchor-offset">
         <div className="rail-offset relative">
           <RailStation label="FAQ" />

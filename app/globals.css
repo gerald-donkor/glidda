@@ -137,6 +137,11 @@
   --rail-x: 4px;
   --rail-gap: clamp(24px, 4vw, 56px);
 
+  /* The hero (§8, row 3). The band's height and the gap between the copy block and the band —
+     the gap is the hero wrapper's flex `gap`, never a margin on a child (§13). */
+  --hero-band-h: clamp(140px, 18vw, 240px);
+  --hero-gap: clamp(56px, 7vw, 96px);
+
   /* Ask bar (§8.1). The footer reserves this height so the fixed bar never covers copy. */
   --ask-bar-height: 56px;
   --z-ask: 50;
@@ -297,6 +302,39 @@
   background: var(--ink);
   transform-origin: top;
   transform: scaleY(0);
+}
+
+/* The rail's entrance cover (§7.3 #1). A --ground-coloured block over the top of the track,
+   retreating downward by scaleY 1 → 0, which above the fold reads as the line drawing in from the
+   top edge. One viewport tall rather than the track's full height: the track spans all of
+   `<main>`, so scaling that would flash the visible portion past in under a frame. It collapses to
+   zero height, so it can never mask the track later.
+
+   Both transform states live here rather than in `@layer base` beside the hero's: `@utility`
+   emits into the utilities layer, which wins over base regardless of specificity, so a
+   `.rail-lead` override written there would never apply. Inside one utility the later
+   declaration wins, which is exactly what is wanted. Rest state is scaleY(0), so with JavaScript
+   disabled the rail is simply present (decision 6). */
+@utility rail-lead {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 100svh;
+  background: var(--ground);
+  transform-origin: bottom;
+  transform: scaleY(0);
+
+  @media (scripting: enabled) {
+    transform: scaleY(1);
+  }
+}
+
+/* The hero's full-bleed slipstream band (§8). It needs no full-bleed trick — the section is
+   already viewport-wide, and `w-screen` would add horizontal overflow equal to the scrollbar
+   width, which §12 forbids outright. */
+@utility hero-band {
+  width: 100%;
+  height: var(--hero-band-h);
 }
 
 /* The node shape: a 7px ink square. Used by station markers and by the wordmark's leading mark,
@@ -537,5 +575,19 @@
 
   h1 {
     line-height: 1.02;
+  }
+
+  /* The hero load's initial state (§7.3 #1, §12).
+     If the hidden state were unconditional CSS, a visitor with JavaScript disabled would get an
+     invisible hero. If GSAP applied it instead, the finished hero would paint and then jump,
+     because hydration runs after the first paint. `scripting: enabled` gives both: the rule
+     applies only where a script exists to undo it, and with JS off it never matches at all.
+     The hero's timeline therefore uses `fromTo`, not `from` — against `opacity: 0` a `from`
+     tween would animate 0 → 0 and the hero would never appear. The rail's half of this lives in
+     the `rail-lead` utility, for the cascade-layer reason documented there. */
+  @media (scripting: enabled) {
+    [data-hero] {
+      opacity: 0;
+    }
   }
 }
