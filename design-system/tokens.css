@@ -1,0 +1,57 @@
+/* Glidda design tokens — REFERENCE ARTIFACT.
+ *
+ * This file is NOT imported and is NOT part of the build. `app/globals.css` is the single
+ * runtime source of these tokens; two live files defining the same custom properties is exactly
+ * the specificity fight AGENTS.md §13 forbids. This copy exists as a flat, framework-free record
+ * for design handoff and for diffing against §6.
+ *
+ * Authority: AGENTS.md §6. Change §6 first, then globals.css, then this file.
+ */
+
+:root {
+  /* Colour — §6.1 */
+  --ink: #17191c;
+  --ground: #e9ebee;
+  --surface: #f7f8f9;
+  --rail: #8a94a0;
+  --signal: #ffc531;
+  --paper: #ffffff;
+
+  /* Route hues — feature panels only */
+  --route-signal: #ffc531;
+  --route-cable: #2f6be8;
+  --route-spruce: #16736b;
+
+  /* Derived */
+  --rail-hairline: color-mix(in oklab, var(--rail) 40%, transparent);
+  --rail-muted: color-mix(in oklab, var(--rail) 60%, var(--ink));
+  --rail-subtle: color-mix(in oklab, var(--rail) 30%, transparent);
+  --ask-shadow: 0 8px 32px -8px color-mix(in oklab, var(--ink) 18%, transparent);
+
+  /* Type scale — §6.2, fluid 360 → 1440 */
+  --text-hero: clamp(2.75rem, 1.36rem + 6.19vw, 5.25rem);
+  --text-headline: clamp(1.875rem, 1.146rem + 3.24vw, 3.25rem);
+  --text-panel: clamp(1.375rem, 1.176rem + 0.88vw, 1.75rem);
+  --text-quote: clamp(1.375rem, 0.977rem + 1.77vw, 2.125rem);
+  --text-body: clamp(1rem, 0.967rem + 0.15vw, 1.0625rem);
+  --text-small: 0.875rem;
+  --text-eyebrow: 0.6875rem;
+
+  /* Shape — §6.3 */
+  --radius-chip: 4px;
+  --radius-card: 12px;
+  --radius-panel: 20px;
+  --radius-pill: 999px;
+
+  /* Layout — §6.3, §6.4 */
+  --rail-inset: clamp(16px, 4vw, 64px);
+  --section-rhythm: clamp(96px, 12vw, 176px);
+  --gutter: clamp(16px, 4vw, 24px);
+  --container-content: 1200px;
+
+  /* Motion — §7.1 */
+  --duration-micro: 200ms;
+  --duration-entrance: 600ms;
+  --ease-entrance: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-arrested: cubic-bezier(0.16, 1, 0.3, 1);
+}

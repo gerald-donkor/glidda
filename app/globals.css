@@ -5,11 +5,54 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Glidda brand colours — AGENTS.md §6.1 */
+  --color-ink: var(--ink);
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-rail: var(--rail);
+  --color-signal: var(--signal);
+  --color-paper: var(--paper);
+  --color-route-signal: var(--route-signal);
+  --color-route-cable: var(--route-cable);
+  --color-route-spruce: var(--route-spruce);
+  --color-rail-muted: var(--rail-muted);
+  --color-rail-hairline: var(--rail-hairline);
+  --color-rail-subtle: var(--rail-subtle);
+
+  /* Faces — AGENTS.md §6.2 */
+  --font-display: var(--font-display-family), sans-serif;
+  --font-body: var(--font-body-family), ui-sans-serif, system-ui, sans-serif;
+  --font-utility: var(--font-utility-family), ui-monospace, monospace;
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-utility);
+  --font-heading: var(--font-display);
+
+  /* Fluid type scale — AGENTS.md §6.2, 360px → 1440px */
+  --text-hero: clamp(2.75rem, 1.36rem + 6.19vw, 5.25rem);
+  --text-headline: clamp(1.875rem, 1.146rem + 3.24vw, 3.25rem);
+  --text-panel: clamp(1.375rem, 1.176rem + 0.88vw, 1.75rem);
+  --text-quote: clamp(1.375rem, 0.977rem + 1.77vw, 2.125rem);
+  --text-body: clamp(1rem, 0.967rem + 0.15vw, 1.0625rem);
+  --text-small: 0.875rem;
+  --text-eyebrow: 0.6875rem;
+
+  /* Radii — AGENTS.md §6.3. Nothing between 4 and 12. */
+  --radius-chip: 4px;
+  --radius-card: 12px;
+  --radius-panel: 20px;
+  --radius-pill: 999px;
+
+  /* Spacing and shell — AGENTS.md §6.3 */
+  --spacing-rhythm: var(--section-rhythm);
+  --spacing-gutter: var(--gutter);
+  --container-content: 1200px;
+
+  /* The one permitted shadow — AGENTS.md §6.3 */
+  --shadow-ask: var(--ask-shadow);
+
+  /* shadcn semantic layer — names untouched, values remapped in :root */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,40 +92,74 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* ── Brand tokens — AGENTS.md §6.1. The only place these values are written. ── */
+  --ink: #17191c;
+  --ground: #e9ebee;
+  --surface: #f7f8f9;
+  --rail: #8a94a0;
+  --signal: #ffc531;
+  --paper: #ffffff;
+
+  /* Route hues — feature panels only, never text, never the rail, never two at once. */
+  --route-signal: #ffc531;
+  --route-cable: #2f6be8;
+  --route-spruce: #16736b;
+
+  /* Derived. --rail-muted mixes 60% toward --ink so muted text clears §12's 4.5:1 floor. */
+  --rail-hairline: color-mix(in oklab, var(--rail) 40%, transparent);
+  --rail-muted: color-mix(in oklab, var(--rail) 60%, var(--ink));
+  --rail-subtle: color-mix(in oklab, var(--rail) 30%, transparent);
+  --ask-shadow: 0 8px 32px -8px color-mix(in oklab, var(--ink) 18%, transparent);
+
+  /* Layout primitives — AGENTS.md §6.3, §6.4 */
+  --rail-inset: clamp(16px, 4vw, 64px);
+  --section-rhythm: clamp(96px, 12vw, 176px);
+  --gutter: clamp(16px, 4vw, 24px);
+
+  /* Motion primitives — AGENTS.md §7.1. CSS-layer micro-interactions only; GSAP owns the rest. */
+  --duration-micro: 200ms;
+  --duration-entrance: 600ms;
+  --ease-entrance: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-arrested: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── shadcn semantic layer, remapped onto the brand tokens above. ── */
+  --background: var(--ground);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface);
+  --muted-foreground: var(--rail-muted);
+  --accent: var(--surface);
+  --accent-foreground: var(--ink);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: var(--rail-hairline);
+  --input: var(--rail-hairline);
+  --ring: var(--ink);
+  --chart-1: var(--route-signal);
+  --chart-2: var(--route-cable);
+  --chart-3: var(--route-spruce);
+  --chart-4: var(--rail);
+  --chart-5: var(--ink);
+  --radius: 0.75rem;
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--ink);
+  --sidebar-primary-foreground: var(--paper);
+  --sidebar-accent: var(--ground);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--rail-hairline);
+  --sidebar-ring: var(--ink);
 }
 
+/* Dark mode is out of scope (§6.1). This block is inert — nothing toggles `.dark` — and is
+   kept only so `dark:` utilities baked into the 60 shadcn primitives still resolve. Its values
+   are stale create-next-app neutrals and do not relate to the Glidda palette. */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -117,14 +194,82 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ── Utilities. @utility, not @layer classes, so they compose with variants (§13). ── */
+
+/* Display face at its signage width. Never faked with transform: scaleX. */
+@utility type-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-variation-settings: "wdth" 115;
+  letter-spacing: -0.02em;
+}
+
+/* The signage voice. Eyebrows, station labels, stat labels, data chips — nothing else. */
+@utility type-utility {
+  font-family: var(--font-utility);
+  font-weight: 500;
+  font-size: var(--text-eyebrow);
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@utility hairline {
+  border: 1px solid var(--rail-hairline);
+}
+
+@utility hairline-b {
+  border-bottom: 1px solid var(--rail-hairline);
+}
+
+@utility hairline-t {
+  border-top: 1px solid var(--rail-hairline);
+}
+
+@utility content-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-content);
+  padding-inline: var(--gutter);
+}
+
+/* Section spacing lives on the section element only; children never set outer margins (§13). */
+@utility section-rhythm {
+  padding-block: var(--section-rhythm);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
-    @apply font-sans;
+    font-family: var(--font-body);
+  }
+
+  body {
+    background-color: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-variation-settings: "wdth" 115;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  h1 {
+    line-height: 0.95;
   }
 }
