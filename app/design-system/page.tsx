@@ -21,7 +21,8 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 
 export default function DesignSystemPage() {
   return (
-    <main className="content-shell section-rhythm flex flex-col gap-16">
+    // A plain div, not <main>: the root layout already provides the page's one <main>.
+    <div className="content-shell section-rhythm flex flex-col gap-16">
       <header className="flex flex-col gap-4">
         <p className="type-utility text-rail-muted">Glidda · primitives</p>
         <h1 className="text-hero">Design system</h1>
@@ -185,6 +186,6 @@ export default function DesignSystemPage() {
           for the graphite focus ring on a ground offset.
         </p>
       </Group>
-    </main>
+    </div>
   );
 }
