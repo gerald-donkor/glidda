@@ -137,6 +137,13 @@
   --rail-x: 4px;
   --rail-gap: clamp(24px, 4vw, 56px);
 
+  /* Vertical room reserved above a section's content for its station label row (§6.4). The label
+     cannot sit beside the heading: it needs --rail-gap - 16px of room and the longest station name
+     is 109px against 40px available at 1440px. So the marker gets its own row and the content
+     starts below it. 16px label row + 24px clearance, on §6.3's 4px scale. Zero below 640px, where
+     §6.4 thins the markers to nodes only and there is no label to clear. */
+  --station-lead: 0px;
+
   /* The hero (§8, row 3). The band's height and the gap between the copy block and the band —
      the gap is the hero wrapper's flex `gap`, never a margin on a child (§13). */
   --hero-band-h: clamp(140px, 18vw, 240px);
@@ -198,6 +205,7 @@
 @media (min-width: 640px) {
   :root {
     --rail-x: var(--gutter);
+    --station-lead: 40px;
   }
 }
 
@@ -345,7 +353,11 @@
   background: var(--ink);
 }
 
-/* A station marker: the node centred on the line, with its label 12px to the right of it. */
+/* A station marker: the node centred on the line, with its label 12px to the right of it. The
+   label occupies its own row above the section's content, not the channel beside the heading —
+   `rail-offset`'s `padding-top: var(--station-lead)` is what reserves that row, so the two rules
+   are a pair and neither means anything alone. `top: 0` resolves against the padding box, whose
+   top edge is the border box's, so the marker still sits at the very top of `rail-offset`. */
 @utility rail-station {
   position: absolute;
   top: 0;
@@ -365,6 +377,7 @@
   margin-inline: auto;
   width: 100%;
   max-width: var(--container-content);
+  padding-top: var(--station-lead);
   padding-right: var(--gutter);
   padding-left: calc(var(--rail-x) + var(--rail-gap));
 }
