@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Martian_Mono, Newsreader } from "next/font/google";
+
+import { AskBar } from "@/components/ask/ask-bar";
+import { AnnouncementBar } from "@/components/layout/announcement-bar";
+import { Rail } from "@/components/layout/rail";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { shell } from "@/lib/copy/shell";
 import "./globals.css";
 
 // Display. `weight` is omitted because `axes` is used — the variable font carries the whole
@@ -41,7 +48,24 @@ export default function RootLayout({
       lang="en"
       className={`${newsreader.variable} ${instrumentSans.variable} ${martianMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <a
+          href="#main"
+          className="sr-only rounded-chip bg-ink px-4 py-2 text-small text-paper focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-(--z-ask)"
+        >
+          {shell.skipLink}
+        </a>
+        <AnnouncementBar />
+        <SiteHeader />
+        {/* `relative` because the Rail is absolutely positioned against the full height of
+            `<main>`, which is also its ScrollTrigger. */}
+        <main id="main" className="relative flex-1">
+          <Rail />
+          {children}
+        </main>
+        <SiteFooter />
+        <AskBar />
+      </body>
     </html>
   );
 }

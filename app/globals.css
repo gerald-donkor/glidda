@@ -50,6 +50,7 @@
 
   /* Spacing and shell — AGENTS.md §6.3 */
   --spacing-rhythm: var(--section-rhythm);
+  --spacing-rhythm-tight: var(--section-rhythm-tight);
   --spacing-gutter: var(--gutter);
   --container-content: 1200px;
 
@@ -127,9 +128,42 @@
   --ask-shadow: 0 10px 40px -12px color-mix(in oklab, var(--ink) 14%, transparent);
 
   /* Layout primitives — AGENTS.md §6.3, §6.4 */
-  --rail-inset: clamp(16px, 4vw, 64px);
   --section-rhythm: clamp(112px, 13vw, 200px);
+  /* A tighter band for sections that read as a continuation of the one above rather than as a new
+     arrival — the logo band sits directly under the hero's slipstream. Roughly 0.6 of
+     --section-rhythm at both ends of its range. */
+  --section-rhythm-tight: clamp(72px, 8vw, 120px);
   --gutter: clamp(16px, 4vw, 24px);
+
+  /* Rail geometry (§6.4). --rail-x is the distance from the content shell's outer edge to the
+     line; on mobile the rail moves to the extreme left gutter, so this is the small value and
+     the ≥640px media query below raises it. --rail-gap is the space between the line and the
+     content that hangs off it. */
+  --rail-x: 4px;
+  --rail-gap: clamp(24px, 4vw, 56px);
+
+  /* Vertical room reserved above a section's content for its station label row (§6.4). The label
+     cannot sit beside the heading: it needs --rail-gap - 16px of room and the longest station name
+     is 109px against 40px available at 1440px. So the marker gets its own row and the content
+     starts below it. 16px label row + 24px clearance, on §6.3's 4px scale. Zero below 640px, where
+     §6.4 thins the markers to nodes only and there is no label to clear. */
+  --station-lead: 0px;
+
+  /* The hero (§8, row 3). The band's height and the gap between the copy block and the band —
+     the gap is the hero wrapper's flex `gap`, never a margin on a child (§13). */
+  --hero-band-h: clamp(140px, 18vw, 240px);
+  --hero-gap: clamp(56px, 7vw, 96px);
+
+  /* Ask bar (§8.1). The footer reserves this height so the fixed bar never covers copy. */
+  --ask-bar-height: 56px;
+  --z-ask: 50;
+  /* The online dot is chrome, and the chrome is monochrome (§6) — see prompt 03, decision 8. */
+  --dot-online: var(--ink);
+
+  /* The slipstream (§6.3). Geometry and grain live here; the hue mapping is the four
+     `.slipstream[data-route]` rules below, so no colour value ever appears in TSX. */
+  --slipstream-shear: -12deg;
+  --slipstream-grain-opacity: 0.14;
 
   /* Motion primitives — AGENTS.md §7.1. CSS-layer micro-interactions only; GSAP owns the rest. */
   --duration-micro: 200ms;
@@ -170,6 +204,14 @@
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--rail-hairline);
   --sidebar-ring: var(--ink);
+}
+
+/* §6.4 — above 640px the rail sits at the content shell's gutter edge rather than hard left. */
+@media (min-width: 640px) {
+  :root {
+    --rail-x: var(--gutter);
+    --station-lead: 40px;
+  }
 }
 
 /* Dark mode is out of scope (§6.1). This block is inert — nothing toggles `.dark` — and is
@@ -254,6 +296,268 @@
   padding-block: var(--section-rhythm);
 }
 
+/* For a section that continues the one above it rather than arriving as a new place. */
+@utility section-rhythm-tight {
+  padding-block: var(--section-rhythm-tight);
+}
+
+/* ── The Rail (§6.4). Geometry lives here so no TSX file carries an arbitrary value. ── */
+
+/* The untravelled length: one hairline, full height of its positioned ancestor. */
+@utility rail-track {
+  position: absolute;
+  inset-block: 0;
+  left: var(--rail-x);
+  width: 1px;
+  background: var(--rail);
+}
+
+/* The travelled length, painted by a scrubbed scaleY. Transform-only (§7.1); the reduced-motion
+   branch sets scaleY(1) once instead of scrubbing. */
+@utility rail-paint {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform-origin: top;
+  transform: scaleY(0);
+}
+
+/* The rail's entrance cover (§7.3 #1). A --ground-coloured block over the top of the track,
+   retreating downward by scaleY 1 → 0, which above the fold reads as the line drawing in from the
+   top edge. One viewport tall rather than the track's full height: the track spans all of
+   `<main>`, so scaling that would flash the visible portion past in under a frame. It collapses to
+   zero height, so it can never mask the track later.
+
+   Both transform states live here rather than in `@layer base` beside the hero's: `@utility`
+   emits into the utilities layer, which wins over base regardless of specificity, so a
+   `.rail-lead` override written there would never apply. Inside one utility the later
+   declaration wins, which is exactly what is wanted. Rest state is scaleY(0), so with JavaScript
+   disabled the rail is simply present (decision 6). */
+@utility rail-lead {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 100svh;
+  background: var(--ground);
+  transform-origin: bottom;
+  transform: scaleY(0);
+
+  @media (scripting: enabled) {
+    transform: scaleY(1);
+  }
+}
+
+/* The hero's full-bleed slipstream band (§8). It needs no full-bleed trick — the section is
+   already viewport-wide, and `w-screen` would add horizontal overflow equal to the scrollbar
+   width, which §12 forbids outright. */
+@utility hero-band {
+  width: 100%;
+  height: var(--hero-band-h);
+}
+
+/* The node shape: a 7px ink square. Used by station markers and by the wordmark's leading mark,
+   so the mark and the rail are visibly one idea. */
+@utility node-square {
+  width: 7px;
+  height: 7px;
+  background: var(--ink);
+}
+
+/* A station marker: the node centred on the line, with its label 12px to the right of it. The
+   label occupies its own row above the section's content, not the channel beside the heading —
+   `rail-offset`'s `padding-top: var(--station-lead)` is what reserves that row, so the two rules
+   are a pair and neither means anything alone. `top: 0` resolves against the padding box, whose
+   top edge is the border box's, so the marker still sits at the very top of `rail-offset`. */
+@utility rail-station {
+  position: absolute;
+  top: 0;
+  left: var(--rail-x);
+  margin-left: -3px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* How a section hangs off the rail rather than merely sitting near it (§6.4). This repeats
+   `content-shell`'s box rather than composing with it: both would set padding-left, and two
+   @utility blocks at equal specificity would resolve by emitted order, which is not something
+   to depend on. Anything absolutely positioned against the rail — a station marker — goes
+   inside this element, which must therefore be `relative`. */
+@utility rail-offset {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-content);
+  padding-top: var(--station-lead);
+  padding-right: var(--gutter);
+  padding-left: calc(var(--rail-x) + var(--rail-gap));
+}
+
+/* Every in-page anchor target, so a heading is never tucked under the top of the viewport. */
+@utility anchor-offset {
+  scroll-margin-top: clamp(48px, 8vw, 96px);
+}
+
+/* ── The Ask bar (§8.1). ── */
+
+/* Fixed, bottom centre, present at every scroll position. */
+@utility ask-bar {
+  position: fixed;
+  z-index: var(--z-ask);
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
+  width: min(560px, 100% - var(--gutter) * 2);
+}
+
+/* The suggested-question row sits out of flow above the shell, so revealing it shifts no
+   layout (§7.1). */
+@utility ask-chips-row {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+}
+
+/* Space the fixed Ask bar occupies, reserved at the bottom of the page so it never covers the
+   last line of the footer at any width (§8.1). */
+@utility ask-bar-reserve {
+  padding-bottom: calc(
+    var(--ask-bar-height) + var(--gutter) * 2 + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+/* ── The slipstream (§6.3). Long parallel streaks, sheared, drifting along their own axis,
+   under a static grain. Not blobs: the form has to read as motion along a line, like the Rail.
+   One implementation, reused with a route prop. ── */
+
+/* The clipping box. `isolation` keeps the grain's multiply blend inside the slipstream so it
+   never composites against the page behind it. The element is absolute, so its consumer must
+   supply a positioned, overflow-clipped box. */
+@utility slipstream {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+/* The shear. A static CSS `rotate` — GSAP only ever touches xPercent on the layers, so the two
+   never write the same transform. Rotating (not skewing) keeps every streak's thickness even.
+   The frame is oversized so the rotated rectangle's corners never pull inside the clip box. */
+@utility slipstream-shear {
+  position: absolute;
+  inset: -25%;
+  rotate: var(--slipstream-shear);
+}
+
+/* One drifting layer. Holds its streaks twice at 200% width, so xPercent 0 → -50 puts the second
+   copy exactly where the first started and the loop has no seam. */
+@utility slipstream-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: 200%;
+  will-change: transform;
+}
+
+/* One of the two identical copies inside a layer. */
+@utility slipstream-half {
+  position: relative;
+  flex: 0 0 50%;
+}
+
+/* A streak. It fades out at both ends through the edge tone, so no streak ever terminates in a
+   hard vertical edge against a panel's rounded corner. Thickness and vertical position come from
+   the fixed array in slipstream.tsx via --streak-h / --streak-top. */
+@utility slipstream-streak {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--streak-top);
+  height: var(--streak-h);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--slipstream-edge) 16%,
+    var(--slipstream-wash) 44%,
+    var(--slipstream-wash) 56%,
+    var(--slipstream-edge) 84%,
+    transparent
+  );
+}
+
+/* The slowest layer, when a route carries an accent. Identical geometry; only the tone differs,
+   so the accent still reads as one of the parallel streaks rather than as a second effect. */
+@utility slipstream-streak-accent {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--slipstream-edge) 16%,
+    var(--slipstream-accent) 44%,
+    var(--slipstream-accent) 56%,
+    var(--slipstream-edge) 84%,
+    transparent
+  );
+}
+
+/* The grain (§6.3). One feTurbulence, rasterised once into a repeating 180px tile, painted as a
+   static overlay — not `filter: url()` on the moving layers, which would re-run turbulence on a
+   full-bleed element every frame. The streaks sliding under it are what makes it read as moving.
+   The filter id lives inside the data URI's own document, so five instances cannot collide. */
+@utility slipstream-grain {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply;
+  opacity: var(--slipstream-grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+@layer components {
+  /* The accent tone, used by the slowest layer only, defaulting to the field's own wash so a
+     route is single-toned unless its rule says otherwise. This default has to live in the same
+     cascade layer as the route rules below: `@utility` emits into the utilities layer, which
+     wins over components regardless of specificity, so a default declared there would beat every
+     route override and silently grey the accent out. */
+  .slipstream {
+    --slipstream-accent: var(--slipstream-wash);
+  }
+
+  /* The only place the slipstream meets a hue (§6.1, §13). Scoped to the component so
+     `data-route` never becomes a global attribute hook. `mono` is the page-chrome variant —
+     the hero and the live demo panel — because colour lives only inside feature panels. */
+  .slipstream[data-route="mono"] {
+    --slipstream-wash: var(--surface);
+    --slipstream-edge: var(--rail);
+  }
+
+  /* The hero and the live demo panel. A monochrome field whose slowest layer carries a diluted
+     signal wash — enough warmth to keep the hero from reading as bare paper, well short of the
+     saturation the Answers panel opens with, so the hue still means something when it arrives.
+     A documented exception to §6.1's "colour lives only inside feature panels". */
+  .slipstream[data-route="mono-signal"] {
+    --slipstream-wash: var(--surface);
+    --slipstream-edge: var(--rail);
+    --slipstream-accent: color-mix(in oklab, var(--wash-signal) 60%, transparent);
+  }
+
+  .slipstream[data-route="signal"] {
+    --slipstream-wash: var(--wash-signal);
+    --slipstream-edge: var(--ground);
+  }
+
+  .slipstream[data-route="cable"] {
+    --slipstream-wash: var(--wash-cable);
+    --slipstream-edge: var(--ground);
+  }
+
+  .slipstream[data-route="spruce"] {
+    --slipstream-wash: var(--wash-spruce);
+    --slipstream-edge: var(--ground);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -261,6 +565,14 @@
 
   html {
     font-family: var(--font-body);
+  }
+
+  /* In-page anchors glide rather than jump. GSAP owns its own reduced-motion branching via
+     gsap.matchMedia() (§7.2); this CSS block covers only what CSS animates. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
@@ -286,5 +598,19 @@
 
   h1 {
     line-height: 1.02;
+  }
+
+  /* The hero load's initial state (§7.3 #1, §12).
+     If the hidden state were unconditional CSS, a visitor with JavaScript disabled would get an
+     invisible hero. If GSAP applied it instead, the finished hero would paint and then jump,
+     because hydration runs after the first paint. `scripting: enabled` gives both: the rule
+     applies only where a script exists to undo it, and with JS off it never matches at all.
+     The hero's timeline therefore uses `fromTo`, not `from` — against `opacity: 0` a `from`
+     tween would animate 0 → 0 and the hero would never appear. The rail's half of this lives in
+     the `rail-lead` utility, for the cascade-layer reason documented there. */
+  @media (scripting: enabled) {
+    [data-hero] {
+      opacity: 0;
+    }
   }
 }

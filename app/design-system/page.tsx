@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Slipstream } from "@/components/motion/slipstream";
 import { Button } from "@/components/ui/button";
 
 import { Swatch } from "./swatch";
@@ -21,7 +22,8 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 
 export default function DesignSystemPage() {
   return (
-    <main className="content-shell section-rhythm flex flex-col gap-16">
+    // A plain div, not <main>: the root layout already provides the page's one <main>.
+    <div className="content-shell section-rhythm flex flex-col gap-16">
       <header className="flex flex-col gap-4">
         <p className="type-utility text-rail-muted">Glidda · primitives</p>
         <h1 className="text-hero">Design system</h1>
@@ -185,6 +187,67 @@ export default function DesignSystemPage() {
           for the graphite focus ring on a ground offset.
         </p>
       </Group>
-    </main>
+
+      <Group title="Texture — the slipstream">
+        <p className="text-body text-rail-muted max-w-prose">
+          The one texture in the system: parallel streaks sheared -12°, drifting along their own
+          axis under a static grain — motion along a line, the same idea as the rail, never blobs.
+          The hero uses <span className="text-ink">mono-signal</span>: a monochrome field whose
+          slowest layer carries a diluted signal wash. The hero gets warmth, and the Answers panel
+          is still where the hue arrives at full strength and starts meaning something.
+        </p>
+
+        <div className="flex flex-col gap-3">
+          <p className="type-utility text-rail-muted">mono · band · the hero&apos;s arrangement</p>
+          <div className="relative flex h-50 flex-col items-center justify-center gap-4 overflow-hidden rounded-panel">
+            <Slipstream route="mono" density="band" />
+            <p className="type-display text-headline relative text-center">
+              A guide that rides with them
+            </p>
+            <Button variant="pill" size="pill" className="relative">
+              Start a guide
+            </Button>
+          </div>
+          <p className="type-utility text-rail-muted">
+            mono-signal · band · the hero, warmed
+          </p>
+          <div className="relative flex h-50 flex-col items-center justify-center gap-4 overflow-hidden rounded-panel">
+            <Slipstream route="mono-signal" density="band" />
+            <p className="type-display text-headline relative text-center">
+              A guide that rides with them
+            </p>
+            <Button variant="pill" size="pill" className="relative">
+              Start a guide
+            </Button>
+          </div>
+          <p className="text-small text-rail-muted">
+            Copy and a solid pill sit on the moving texture here because a texture reviewed on its
+            own tells you nothing about whether anything survives on top of it.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {(
+            [
+              { route: "signal", label: "signal · answers" },
+              { route: "cable", label: "cable · demos" },
+              { route: "spruce", label: "spruce · onboarding" },
+            ] as const
+          ).map(({ route, label }) => (
+            <div key={route} className="flex flex-col gap-2">
+              <div className="relative aspect-square overflow-hidden rounded-panel hairline">
+                <Slipstream route={route} density="panel" />
+              </div>
+              <p className="type-utility text-ink">{label}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-body text-rail-muted max-w-prose">
+          Three hues on one screen breaks §6.1&apos;s &ldquo;never two at once&rdquo; — which is
+          the point of a review route. On the page itself each hue appears in its own section and
+          nowhere else.
+        </p>
+      </Group>
+    </div>
   );
 }

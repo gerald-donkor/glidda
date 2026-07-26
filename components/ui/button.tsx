@@ -25,6 +25,12 @@ const buttonVariants = cva(
           focusRing,
           disabledState
         ),
+        // Glidda §8.1 — the Ask bar's suggested-question chips.
+        chip: cn(
+          "rounded-pill hairline bg-paper text-small text-ink hover:bg-surface transition-colors duration-(--duration-micro) ease-(--ease-entrance)",
+          focusRing,
+          disabledState
+        ),
         // Glidda §8 — the light companion pill that sits beside it.
         pillSecondary: cn(
           "rounded-pill hairline bg-surface text-ink hover:bg-rail-subtle transition-colors duration-(--duration-micro) ease-(--ease-entrance)",
@@ -45,6 +51,8 @@ const buttonVariants = cva(
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
         pill: "h-11 gap-2 px-6 text-body",
+        // Glidda §8.1 — pairs with the `chip` variant.
+        chip: "h-8 gap-1.5 px-4",
       },
     },
     defaultVariants: {
