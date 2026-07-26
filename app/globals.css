@@ -127,9 +127,21 @@
   --ask-shadow: 0 10px 40px -12px color-mix(in oklab, var(--ink) 14%, transparent);
 
   /* Layout primitives — AGENTS.md §6.3, §6.4 */
-  --rail-inset: clamp(16px, 4vw, 64px);
   --section-rhythm: clamp(112px, 13vw, 200px);
   --gutter: clamp(16px, 4vw, 24px);
+
+  /* Rail geometry (§6.4). --rail-x is the distance from the content shell's outer edge to the
+     line; on mobile the rail moves to the extreme left gutter, so this is the small value and
+     the ≥640px media query below raises it. --rail-gap is the space between the line and the
+     content that hangs off it. */
+  --rail-x: 4px;
+  --rail-gap: clamp(24px, 4vw, 56px);
+
+  /* Ask bar (§8.1). The footer reserves this height so the fixed bar never covers copy. */
+  --ask-bar-height: 56px;
+  --z-ask: 50;
+  /* The online dot is chrome, and the chrome is monochrome (§6) — see prompt 03, decision 8. */
+  --dot-online: var(--ink);
 
   /* Motion primitives — AGENTS.md §7.1. CSS-layer micro-interactions only; GSAP owns the rest. */
   --duration-micro: 200ms;
@@ -170,6 +182,13 @@
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--rail-hairline);
   --sidebar-ring: var(--ink);
+}
+
+/* §6.4 — above 640px the rail sits at the content shell's gutter edge rather than hard left. */
+@media (min-width: 640px) {
+  :root {
+    --rail-x: var(--gutter);
+  }
 }
 
 /* Dark mode is out of scope (§6.1). This block is inert — nothing toggles `.dark` — and is
@@ -254,6 +273,93 @@
   padding-block: var(--section-rhythm);
 }
 
+/* ── The Rail (§6.4). Geometry lives here so no TSX file carries an arbitrary value. ── */
+
+/* The untravelled length: one hairline, full height of its positioned ancestor. */
+@utility rail-track {
+  position: absolute;
+  inset-block: 0;
+  left: var(--rail-x);
+  width: 1px;
+  background: var(--rail);
+}
+
+/* The travelled length, painted by a scrubbed scaleY. Transform-only (§7.1); the reduced-motion
+   branch sets scaleY(1) once instead of scrubbing. */
+@utility rail-paint {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform-origin: top;
+  transform: scaleY(0);
+}
+
+/* The node shape: a 7px ink square. Used by station markers and by the wordmark's leading mark,
+   so the mark and the rail are visibly one idea. */
+@utility node-square {
+  width: 7px;
+  height: 7px;
+  background: var(--ink);
+}
+
+/* A station marker: the node centred on the line, with its label 12px to the right of it. */
+@utility rail-station {
+  position: absolute;
+  top: 0;
+  left: var(--rail-x);
+  margin-left: -3px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* How a section hangs off the rail rather than merely sitting near it (§6.4). This repeats
+   `content-shell`'s box rather than composing with it: both would set padding-left, and two
+   @utility blocks at equal specificity would resolve by emitted order, which is not something
+   to depend on. Anything absolutely positioned against the rail — a station marker — goes
+   inside this element, which must therefore be `relative`. */
+@utility rail-offset {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-content);
+  padding-right: var(--gutter);
+  padding-left: calc(var(--rail-x) + var(--rail-gap));
+}
+
+/* Every in-page anchor target, so a heading is never tucked under the top of the viewport. */
+@utility anchor-offset {
+  scroll-margin-top: clamp(48px, 8vw, 96px);
+}
+
+/* ── The Ask bar (§8.1). ── */
+
+/* Fixed, bottom centre, present at every scroll position. */
+@utility ask-bar {
+  position: fixed;
+  z-index: var(--z-ask);
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
+  width: min(560px, 100% - var(--gutter) * 2);
+}
+
+/* The suggested-question row sits out of flow above the shell, so revealing it shifts no
+   layout (§7.1). */
+@utility ask-chips-row {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+}
+
+/* Space the fixed Ask bar occupies, reserved at the bottom of the page so it never covers the
+   last line of the footer at any width (§8.1). */
+@utility ask-bar-reserve {
+  padding-bottom: calc(
+    var(--ask-bar-height) + var(--gutter) * 2 + env(safe-area-inset-bottom, 0px)
+  );
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -261,6 +367,14 @@
 
   html {
     font-family: var(--font-body);
+  }
+
+  /* In-page anchors glide rather than jump. GSAP owns its own reduced-motion branching via
+     gsap.matchMedia() (§7.2); this CSS block covers only what CSS animates. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
