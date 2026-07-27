@@ -51,6 +51,28 @@ export const HERO = {
 } as const
 
 /**
+ * The three capability sections (§8, row 8; §7.3 #3).
+ */
+export const CAPABILITY = {
+  /** Accordion dwell per row, seconds. The underline's tween duration *is* the timer (§7.1), so
+   *  there is no second source of truth and no setTimeout racing a tween. */
+  dwell: 5,
+  /** Row-body crossfade. */
+  swap: DURATION.micro,
+  /** px the row body rises through as it swaps in. */
+  swapRise: 4,
+  /** px of scrubbed carriage along the rail (§6.4). Small enough to read as the panel being
+   *  carried by the line rather than as parallax decoration. */
+  drift: 32,
+  /** One full vignette scene cycle, seconds — two scenes, so each holds for about half of it.
+   *  Inside §7.1's 8–20s ambient window, and deliberately coprime with SLIPSTREAM.durations so
+   *  the panel's scenes and its texture never lock into a visible beat. */
+  vignette: 13,
+  /** px the vignette's parts rise through as their scene arrives. */
+  vignetteRise: 8,
+} as const
+
+/**
  * Ask-bar typewriter timings, in seconds. One question costs
  * TYPE_SPEED×len + HOLD + DELETE_SPEED×len + PAUSE; three questions of ~25 characters land
  * the full cycle inside §7.1's 8–20s ambient window.

@@ -378,6 +378,23 @@
   gap: 12px;
 }
 
+/* A node placed on the rail against its own relative row, rather than pinned to the section top
+   the way `rail-station` is. Backs out of the rail-offset padding by exactly the gap plus the
+   half-node centring, so it lands on the line at every width including 360px.
+
+   Its parent must be the element the node should line up with — the route's numeral — not the
+   row: `top` is set in `em`, so it resolves against that element's own font size and the node
+   centres on the numeral's cap height rather than floating beside the row's blank space. 0.38em
+   is the cap centre of the Display face at `leading-none`; the negative margin is the same
+   half-node centring applied vertically. */
+@utility rail-node {
+  position: absolute;
+  left: calc(-1 * var(--rail-gap));
+  margin-left: -3px;
+  top: 0.38em;
+  margin-top: -3px;
+}
+
 /* How a section hangs off the rail rather than merely sitting near it (§6.4). This repeats
    `content-shell`'s box rather than composing with it: both would set padding-left, and two
    @utility blocks at equal specificity would resolve by emitted order, which is not something
@@ -512,6 +529,48 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 180px 180px;
+}
+
+/* ── The capability panels (§8, row 8). ── */
+
+/* The square panel a slipstream and a vignette live inside. The aspect ratio, the narrow-width
+   floor, and the cap that stops the panel outgrowing its text column at 1440px are one decision
+   and are written once here rather than as three magic numbers in three files (§13). The consumer
+   still supplies `relative overflow-hidden` semantics through this utility itself, which is what
+   `Slipstream` requires. */
+@utility capability-panel {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 1 / 1;
+  min-height: 320px;
+}
+
+/* One vignette scene, stacked on its siblings so a crossfade shifts no layout. Every scene after
+   the first rests hidden, which is also the JavaScript-disabled and reduced-motion state (§7.2):
+   scene one renders, the rest stay out of the way. GSAP writes inline opacity, which beats this
+   regardless of cascade layer. */
+@utility vignette-scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  &:not(:first-child) {
+    opacity: 0;
+  }
+}
+
+/* The frosted paper a vignette part sits on. Translucent so the route wash still reads through
+   it — the hue comes entirely from the slipstream behind, never from a part (§6.1). One hairline,
+   no shadow: §6.3 allows exactly one shadow on the page and the Ask bar has it. */
+@utility vignette-surface {
+  background: color-mix(in oklab, var(--paper) 86%, transparent);
+  border: 1px solid var(--rail-hairline);
+  backdrop-filter: blur(6px);
 }
 
 @layer components {
