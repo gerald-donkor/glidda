@@ -1,3 +1,4 @@
+import { Monogram } from "@/components/layout/monogram"
 import { PlaceholderChip } from "@/components/layout/placeholder-chip"
 import { RailStation } from "@/components/layout/rail-station"
 import { proofQuote, proofStats } from "@/lib/copy/placeholder/proof"
@@ -38,13 +39,7 @@ export function ProofBand() {
               </blockquote>
 
               <figcaption className="mt-8 flex items-center gap-3 text-small text-rail-muted lg:justify-end">
-                {/* The name follows in text, so announcing the initials would be noise. */}
-                <span
-                  aria-hidden
-                  className="type-utility flex size-10 shrink-0 items-center justify-center rounded-full bg-surface text-rail-muted"
-                >
-                  {proofQuote.monogram}
-                </span>
+                <Monogram initials={proofQuote.monogram} />
                 <span>
                   <span className="text-ink">{proofQuote.name}</span>
                   {", "}

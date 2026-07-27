@@ -73,6 +73,22 @@ export const CAPABILITY = {
 } as const
 
 /**
+ * The testimonial carousel's quote swap (§8 row 11). Not a fourth orchestrated moment (§7.3) — a
+ * click-driven opacity change on one pair of elements, in the same class as `CAPABILITY.swap`.
+ */
+export const TESTIMONIAL = {
+  /** The outgoing quote's fade. */
+  out: 0.15,
+  /** The incoming quote's fade. Matches --duration-micro. */
+  in: DURATION.micro,
+  /** Seconds after the fade-out starts that the fade-in begins. Deliberately most of the way
+   *  through the out tween: two three-line quotes overlapping at half opacity ghosts, so the
+   *  overlap is short enough to hide the seam and short enough not to read as a dissolve.
+   *  Total 0.30s. */
+  overlap: 0.1,
+} as const
+
+/**
  * Ask-bar typewriter timings, in seconds. One question costs
  * TYPE_SPEED×len + HOLD + DELETE_SPEED×len + PAUSE; three questions of ~25 characters land
  * the full cycle inside §7.1's 8–20s ambient window.

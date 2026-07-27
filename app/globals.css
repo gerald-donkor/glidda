@@ -378,6 +378,19 @@
   gap: 12px;
 }
 
+/* The Rail's last stop (§6.4). `rail-station`'s geometry with a larger node — the half-node
+   centring is therefore -5px, not -3px. Not `node-square`, which is fixed at 7px and is shared
+   with the wordmark; a terminus that matched every other station would not read as an arrival. */
+@utility rail-terminus {
+  position: absolute;
+  top: 0;
+  left: var(--rail-x);
+  margin-left: -5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* A node placed on the rail against its own relative row, rather than pinned to the section top
    the way `rail-station` is. Backs out of the rail-offset padding by exactly the gap plus the
    half-node centring, so it lands on the line at every width including 360px.
@@ -407,6 +420,28 @@
   padding-top: var(--station-lead);
   padding-right: var(--gutter);
   padding-left: calc(var(--rail-x) + var(--rail-gap));
+}
+
+/* Every child in one grid cell, so a stack of alternatives is as tall as its tallest member at
+   every width and a crossfade between them changes no height (§7.1). Grid, not the absolute
+   positioning `vignette-scene` uses: an absolute stack collapses its parent to zero height and
+   would need a hardcoded reserve, which is exactly the magic number §13 rules out. */
+@utility crossfade-stack {
+  display: grid;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+/* For an affordance that can do nothing without JavaScript — it is absent rather than dead (§12).
+   Costs no hydration and no state, unlike a feature check in an effect. */
+@utility scripting-only {
+  display: none;
+
+  @media (scripting: enabled) {
+    display: flex;
+  }
 }
 
 /* Every in-page anchor target, so a heading is never tucked under the top of the viewport. */
@@ -599,6 +634,17 @@
     --slipstream-wash: var(--surface);
     --slipstream-edge: var(--rail);
     --slipstream-accent: color-mix(in oklab, var(--wash-signal) 60%, transparent);
+  }
+
+  /* The resting state of a crossfade stack: one slide shown, the rest out of the way. This is
+     also the JavaScript-disabled state and the reduced-motion state (§7.2), and it is what
+     `revertOnUpdate` reverts *to* — so once GSAP strips its inline styles the DOM is already
+     correct for the new index. GSAP writes inline opacity, which beats this regardless of layer.
+
+     The consequence for the component is that at the moment its effect runs the outgoing slide is
+     already hidden here, so both tweens must be `fromTo` — the same trap `[data-hero]` documents. */
+  [data-slide][data-active="false"] {
+    opacity: 0;
   }
 
   .slipstream[data-route="signal"] {

@@ -53,6 +53,10 @@ const buttonVariants = cva(
         pill: "h-11 gap-2 px-6 text-body",
         // Glidda §8.1 — pairs with the `chip` variant.
         chip: "h-8 gap-1.5 px-4",
+        // Glidda §8 row 11 — a square icon button at `pill`'s height, so the two share a shape.
+        // 44px clears WCAG 2.5.8's target size, which `icon-lg`'s 36px does not comfortably do
+        // for the page's only pointer-driven navigation.
+        "icon-pill": "size-11",
       },
     },
     defaultVariants: {
