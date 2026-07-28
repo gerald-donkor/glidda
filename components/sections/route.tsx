@@ -22,8 +22,11 @@ export function RouteSection() {
       <div className="rail-offset relative">
         <RailStation label={route.station} />
 
+        {/* Both children carry `min-w-0`. A grid item's automatic minimum is its min-content
+            width, so one unbreakable token anywhere inside — the embed snippet is exactly that —
+            sizes the track wider than the viewport and scrolls the whole page (§12). */}
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
+          <div className="min-w-0">
             {/* A label, not a heading — promoting it would put an h3 above its own h2. */}
             <p className="type-utility text-rail-muted">{route.eyebrow}</p>
 

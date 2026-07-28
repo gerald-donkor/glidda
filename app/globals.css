@@ -157,6 +157,9 @@
   /* Ask bar (§8.1). The footer reserves this height so the fixed bar never covers copy. */
   --ask-bar-height: 56px;
   --z-ask: 50;
+  /* How tall the post-submit thread may grow (§8.1). Kept low at 360px so the on-screen keyboard
+     and the thread do not fight over the viewport; the ≥640px query below raises it. */
+  --ask-thread-max-h: 45vh;
   /* The online dot is chrome, and the chrome is monochrome (§6) — see prompt 03, decision 8. */
   --dot-online: var(--ink);
 
@@ -211,6 +214,7 @@
   :root {
     --rail-x: var(--gutter);
     --station-lead: 40px;
+    --ask-thread-max-h: min(52vh, 420px);
   }
 }
 
@@ -468,6 +472,21 @@
   bottom: calc(100% + 8px);
   left: 0;
   right: 0;
+}
+
+/* The post-submit thread (§8.1, prompt 15). Out of flow above the form for the same reason the
+   chips row is: the form stays at the same position at every point and the page behind never
+   reflows. It carries no shadow of its own — it sits inside the element that already owns the
+   page's one permitted shadow (§6.3). A long unbroken string in an answer wraps inside the panel
+   rather than widening it (§12). */
+@utility ask-thread {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  right: 0;
+  max-height: var(--ask-thread-max-h);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
 }
 
 /* Space the fixed Ask bar occupies, reserved at the bottom of the page so it never covers the

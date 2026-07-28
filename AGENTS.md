@@ -496,7 +496,13 @@ Meet this without announcing it in the UI:
 - **CSS specificity:** Tailwind utilities in the markup are the default. When a component needs custom CSS, scope it and keep specificity flat — do not write a type-level selector (`.section`) and an element-level one (`.cta`) that fight over the same padding. Section spacing lives on the section element only; children never set their own outer margins.
 - No unrelated refactors, no unrequested features, no dead code, no commented-out blocks.
 - Safe error handling on anything async. No swallowed promises.
-- No secrets in client code. There are no server routes in scope yet; when the Ask bar gets a backend, its model key is server-only and this file gets an environment-variable table.
+- No secrets in client code.
+
+**Environment variables.** One route exists — `app/api/ask/route.ts`, the Ask bar's backend. Its key is server-only and is read inside the handler, never at module scope, so a build without a key still succeeds.
+
+| Variable | Scope | Required by | Notes |
+| --- | --- | --- | --- |
+| `GEMINI_API_KEY` | Server only | `app/api/ask/route.ts` | Never `NEXT_PUBLIC_`. Never referenced from a client component. Lives in `.env.local` (gitignored); `.env.example` is committed with the name and no value. A missing key logs server-side and returns the generic error — the response body never says why. |
 
 ---
 
@@ -521,8 +527,11 @@ Before any deploy that will be publicly reachable, run `grep -rn "placeholder: t
 
 Do not resolve these silently. Bring them up when a prompt reaches them.
 
-- **Post-submit Ask bar UI** — undesigned. Inline expanding thread, side sheet, or full takeover.
-- **Ask bar backend** — no model provider chosen, no route, no rate limiting. Section 13's secrets rule applies the moment this lands.
+- ~~**Post-submit Ask bar UI**~~ — **resolved 2026-07-27** (`prompts/15-ask-bar-post-submit.md`): an inline thread that grows upward from the bar and stays fixed bottom-centre. A side sheet and a full takeover were both rejected.
+- ~~**Ask bar backend**~~ — **resolved 2026-07-27**: `app/api/ask/route.ts` streams from Gemini (`gemini-3.6-flash`, via `@google/genai`), grounded in the page's own copy via `lib/ask/system-prompt.ts`, with a server-only key and an in-memory rate limiter. Conversation persistence and multi-turn history stayed out of scope.
+- **A durable rate-limit store** — `lib/ask/rate-limit.ts` keeps its window in a module-scope `Map`, which is per-process. On one long-lived Node process it works; on a serverless platform with per-request isolates it degrades to approximately nothing. It is a speed bump, not a defence. A shared store (Redis, Upstash, a platform primitive) is required before any public deploy of the Ask route.
+- **Ask bar multi-turn and persistence** — the thread dies with the tab and every question is answered independently. A follow-up like "what about the second one?" will not work, by design. Multi-turn has real context-window and cost implications and needs its own prompt.
+- **A spend ceiling for the Ask route** — nothing caps total model spend. A per-day ceiling and an alert are a deploy-readiness item.
 - **Swapping the placeholders** — the logo band, proof stats, and testimonials all ship with fixtures per section 11. Swapping them for real customers, numbers, and quotes is a tracked task, not a discovered surprise. Until it happens, every deploy report lists the outstanding `placeholder: true` hits.
 - **Closing CTA visual** — needs its own concept; must not be hands.
 - **The Glidda mark** — no wordmark or logo exists yet. The header currently needs a text-only wordmark in the Display face.

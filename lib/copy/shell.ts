@@ -56,6 +56,9 @@ export const ask: {
   focusPlaceholder: string
   reducedMotionPlaceholder: string
   chips: [string, string, string]
+  /** Failure notices, rendered in the thread's assistant slot (prompt 15, decision 7). Each says
+   *  what happened and what to do next; none of them apologises and none of them is vague (§11). */
+  errors: { rateLimited: string; failed: string }
 } = {
   restQuestions: [
     "What does Glidda do?",
@@ -65,6 +68,10 @@ export const ask: {
   focusPlaceholder: "Ask me anything",
   reducedMotionPlaceholder: "Ask me anything about Glidda",
   chips: ["What is Glidda?", "How does setup work?", "Show me a demo"],
+  errors: {
+    rateLimited: "That's a lot of questions at once. Give it a minute and ask again.",
+    failed: "Something went wrong answering that. Try again, or email hello@glidda.com.",
+  },
 }
 
 export const shell = {
@@ -76,4 +83,8 @@ export const shell = {
   askLabel: "Ask Glidda a question",
   askSend: "Send question",
   askSuggestions: "Suggested questions",
+  askThreadLabel: "Conversation with Glidda",
+  askVisitorPrefix: "You said",
+  askAssistantPrefix: "Glidda said",
+  askStreaming: "Glidda is answering",
 } as const

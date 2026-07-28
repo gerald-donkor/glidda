@@ -18,7 +18,7 @@ import { route } from "@/lib/copy/route"
  */
 export function EmbedPanel() {
   return (
-    <div className="relative rounded-panel bg-surface p-5 sm:p-8 lg:p-10">
+    <div className="relative min-w-0 rounded-panel bg-surface p-5 sm:p-8 lg:p-10">
       <div
         aria-hidden
         className="flex aspect-video w-full overflow-hidden rounded-card hairline bg-paper"
