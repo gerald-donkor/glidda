@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# The template is the exception: it carries variable names and no values, and a clone that
+# does not get it has no record of what the app needs (AGENTS.md §13).
+!.env.example
 
 # vercel
 .vercel
