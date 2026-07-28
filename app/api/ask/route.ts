@@ -1,6 +1,6 @@
 import { ApiError, GoogleGenAI } from "@google/genai"
 
-import { clientKey, isRateLimited } from "@/lib/ask/rate-limit"
+import { checkRateLimit } from "@/lib/ask/rate-limit"
 import { SYSTEM_PROMPT } from "@/lib/ask/system-prompt"
 import { askRequestSchema } from "@/lib/ask/types"
 import { ask } from "@/lib/copy/shell"
@@ -28,9 +28,10 @@ import { ask } from "@/lib/copy/shell"
 export const runtime = "nodejs"
 export const maxDuration = 30
 
-/** Chosen because it answers on the free tier: `gemini-3.6-flash` allows 20 requests a day there,
- *  which cannot run a page-wide Ask bar. Revisit alongside the spend ceiling (§15) if billing is
- *  ever enabled. */
+/** Chosen because it answers on the free tier. `gemini-3.6-flash` was the first choice and allows
+ *  only 20 requests a day there, which cannot run a page-wide Ask bar; this one's free-tier
+ *  allowance is what the daily ceiling in `lib/ask/rate-limit.ts` is sized against. Revisit both
+ *  together if billing is ever enabled. */
 const MODEL = "gemini-3.5-flash"
 /** Response text only — thinking is budgeted separately by `thinking_level`. Answers are short by
  *  design, so this is a ceiling rather than a target. */
@@ -41,8 +42,13 @@ function json(body: { error: string }, status: number) {
 }
 
 export async function POST(request: Request) {
-  if (isRateLimited(clientKey(request))) {
-    return json({ error: ask.errors.rateLimited }, 429)
+  // First, before the body is even parsed: a caller who is over the limit should not get to
+  // allocate a JSON parse. Both refusals are 429 rather than 503 — the client renders `error` from
+  // any non-2xx, and 503 would invite a crawler to treat the page as down.
+  const verdict = await checkRateLimit(request)
+  if (!verdict.allowed) {
+    const error = verdict.reason === "ceiling" ? ask.errors.dailyLimit : ask.errors.rateLimited
+    return json({ error }, 429)
   }
 
   let body: unknown

@@ -17,7 +17,7 @@ import { Testimonials } from "@/components/sections/testimonials"
  *
  * §8's structure is complete — every row from the announcement bar to the footer exists. What
  * remains is §15's open decisions, not sections: swapping the fixtures, the snippet host, the
- * post-submit Ask bar UI and its backend, the Glidda mark, and the unused `motion` package.
+ * post-submit Ask bar UI and its backend, and the Glidda mark.
  */
 export default function Home() {
   return (

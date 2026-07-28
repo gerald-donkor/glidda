@@ -57,8 +57,11 @@ export const ask: {
   reducedMotionPlaceholder: string
   chips: [string, string, string]
   /** Failure notices, rendered in the thread's assistant slot (prompt 15, decision 7). Each says
-   *  what happened and what to do next; none of them apologises and none of them is vague (§11). */
-  errors: { rateLimited: string; failed: string }
+   *  what happened and what to do next; none of them apologises and none of them is vague (§11).
+   *  None of them names the provider, a quota, or a figure either — that would tell an attacker
+   *  their script worked, and tell an honest visitor about a vendor relationship that is none of
+   *  their business. */
+  errors: { rateLimited: string; dailyLimit: string; failed: string }
 } = {
   restQuestions: [
     "What does Glidda do?",
@@ -69,7 +72,11 @@ export const ask: {
   reducedMotionPlaceholder: "Ask me anything about Glidda",
   chips: ["What is Glidda?", "How does setup work?", "Show me a demo"],
   errors: {
-    rateLimited: "That's a lot of questions at once. Give it a minute and ask again.",
+    // "A minute" was accurate when this covered only the 60-second burst window. It now also
+    // covers a per-visitor daily cap, so the interval is left out rather than stated wrongly.
+    rateLimited: "That's a lot of questions at once. Give it a moment and ask again.",
+    dailyLimit:
+      "Glidda has answered as many questions as it can today. Try again tomorrow, or email hello@glidda.com.",
     failed: "Something went wrong answering that. Try again, or email hello@glidda.com.",
   },
 }

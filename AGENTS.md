@@ -70,7 +70,7 @@ Use only these, and only when relevant:
 
 Do not invent new skills. For Tailwind v4, TypeScript, and Zod, use existing project patterns and package docs.
 
-**Animation library decision:** GSAP is the animation library for this project. `motion` is also installed; do not use both in one component, and do not add new `motion` usage without asking. Prefer GSAP for anything scroll-linked or sequenced.
+**Animation library decision:** GSAP is the animation library for this project, and the only one. `motion` was declared but imported nowhere and was removed as dead weight (`prompts/20-repo-housekeeping.md`). Adding any second animation library needs its own prompt and approval.
 
 ---
 
@@ -384,18 +384,27 @@ app/
   layout.tsx          fonts, metadata, the shell
   page.tsx            landing route — composition only
   globals.css         tokens, @theme, base styles
+  api/ask/route.ts    the Ask bar's backend — the only route handler
+  design-system/      internal token reference, noindex — not a public route
 components/
   ui/                 shadcn primitives — extend, don't fork
   layout/             header, footer, announcement-bar, rail
   sections/           one file per section in section 8
-  motion/             slipstream, vignettes, typewriter
+  motion/             slipstream and the panel vignettes
   ask/                the Ask bar
 lib/
   utils.ts            cn()
+  ask/                server-side Ask modules — rate limit, system prompt, request schema
   copy/               page copy as typed objects
     placeholder/      fabricated proof fixtures — section 11.1
   gsap/               plugin registration, shared eases
 hooks/
+  use-mobile.ts       breakpoint match
+  use-typewriter-placeholder.ts   the Ask bar's rest-state placeholder loop
+scripts/
+  check-responsive.mts   the section 12 no-horizontal-scroll guard — never ships
+design-system/
+  tokens.{json,css}   reference artifacts, imported nowhere by design — do not delete
 ```
 
 Rules:
@@ -498,11 +507,17 @@ Meet this without announcing it in the UI:
 - Safe error handling on anything async. No swallowed promises.
 - No secrets in client code.
 
-**Environment variables.** One route exists — `app/api/ask/route.ts`, the Ask bar's backend. Its key is server-only and is read inside the handler, never at module scope, so a build without a key still succeeds.
+**Environment variables.** One route exists — `app/api/ask/route.ts`, the Ask bar's backend — and it plus its rate limiter read five variables. **Every one of them is server-only, and every one is read inside the handler or a function it calls, never at module scope**, so a build on a machine with none of them set still succeeds. That rule is what makes a keyless CI possible; a store client constructed at module scope would break it silently.
+
+Add a new variable to this table, to `.env.example`, and to the code in the same commit. None may ever be prefixed `NEXT_PUBLIC_`, and none may be referenced from a client component.
 
 | Variable | Scope | Required by | Notes |
 | --- | --- | --- | --- |
-| `GEMINI_API_KEY` | Server only | `app/api/ask/route.ts` | Never `NEXT_PUBLIC_`. Never referenced from a client component. Lives in `.env.local` (gitignored); `.env.example` is committed with the name and no value. A missing key logs server-side and returns the generic error — the response body never says why. |
+| `GEMINI_API_KEY` | Server only | `app/api/ask/route.ts` | Lives in `.env.local` (gitignored); `.env.example` is committed with the name and no value. A missing key logs server-side and returns the generic error — the response body never says why. |
+| `UPSTASH_REDIS_REST_URL` | Server only | `lib/ask/rate-limit.ts` | The shared counter store. Absent, counters fall back to in-process — adequate on one long-lived Node process, useless on serverless. Unreachable, the burst limiter degrades in-process and the daily ceiling refuses. |
+| `UPSTASH_REDIS_REST_TOKEN` | Server only | `lib/ask/rate-limit.ts` | Same. |
+| `ASK_RATE_LIMIT_SALT` | Server only | `lib/ask/rate-limit.ts` | Any random string. Client addresses are hashed before they reach the store; a missing salt logs an error and the hash stops being a privacy control. |
+| `ASK_DAILY_REQUEST_LIMIT` | Server only | `lib/ask/rate-limit.ts` | Optional integer overriding the global daily request ceiling. The code default is authoritative; a malformed value logs and falls back rather than becoming `NaN` and disabling the ceiling. |
 
 ---
 
@@ -510,10 +525,13 @@ Meet this without announcing it in the UI:
 
 Run from the project root and report the real output:
 
-- `npm run typecheck` — **this script does not exist yet.** Add `"typecheck": "tsc --noEmit"` to `package.json` as part of the first implementation prompt. Until then run `npx tsc --noEmit`.
+- `npm run typecheck` — `tsc --noEmit`. Must be clean.
 - `npm run lint` — ESLint.
+- `npm run check:responsive` — loads `/` at 360, 768, 1024, and 1440 and asserts the page is no wider than the viewport (section 12). **Required for any prompt that changes layout, spacing, a section's markup, or the type scale.** Not required for copy-only, backend-only, or motion-only changes — it runs a production build and takes tens of seconds, and a check that is mandatory on every trivial change gets routed around.
 - `npm run build` — only when routes, config, fonts, or server modules changed.
 - `npm run dev` — dev server for manual review.
+
+**The lint bar.** `npm run lint` has three pre-existing errors, one each in `components/layout/wordmark.tsx`, `components/ui/carousel.tsx`, and `hooks/use-mobile.ts`. That is the baseline — the same three files, not merely the same count. Any new error is a failure. Cite this line rather than restating the bar in each prompt.
 
 After every implementation run typecheck and lint at minimum. Add build when routes or config changed. Do not claim a check passed without running it; paste the output.
 
@@ -529,14 +547,14 @@ Do not resolve these silently. Bring them up when a prompt reaches them.
 
 - ~~**Post-submit Ask bar UI**~~ — **resolved 2026-07-27** (`prompts/15-ask-bar-post-submit.md`): an inline thread that grows upward from the bar and stays fixed bottom-centre. A side sheet and a full takeover were both rejected.
 - ~~**Ask bar backend**~~ — **resolved 2026-07-27**: `app/api/ask/route.ts` streams from Gemini (`gemini-3.5-flash`, via `@google/genai`), grounded in the page's own copy via `lib/ask/system-prompt.ts`, with a server-only key and an in-memory rate limiter. Conversation persistence and multi-turn history stayed out of scope.
-- **A durable rate-limit store** — `lib/ask/rate-limit.ts` keeps its window in a module-scope `Map`, which is per-process. On one long-lived Node process it works; on a serverless platform with per-request isolates it degrades to approximately nothing. It is a speed bump, not a defence. A shared store (Redis, Upstash, a platform primitive) is required before any public deploy of the Ask route.
+- ~~**A durable rate-limit store**~~ — **resolved 2026-07-28** (`prompts/18-ask-route-deploy-readiness.md`): the counters live in Upstash Redis over HTTP, keyed by a salted hash of the client address, with the in-memory map kept only as the burst limiter's fail-open fallback. Written for a serverless target; `CLIENT_IP_HEADERS` in `lib/ask/rate-limit.ts` must change if the platform does.
 - **Ask bar multi-turn and persistence** — the thread dies with the tab and every question is answered independently. A follow-up like "what about the second one?" will not work, by design. Multi-turn has real context-window and cost implications and needs its own prompt.
-- **A spend ceiling for the Ask route** — nothing caps total model spend. A per-day ceiling and an alert are a deploy-readiness item.
+- ~~**A spend ceiling for the Ask route**~~ — **resolved 2026-07-28** (`prompts/18-ask-route-deploy-readiness.md`): a global per-UTC-day request ceiling plus a per-visitor daily sub-cap, both in `lib/ask/rate-limit.ts`, both checked before the model call, with `console.warn` at 50/80/100%. **Still outstanding and not code:** the key is on the free tier, whose own daily cap is currently doing most of the protecting. Enabling billing removes that silently — so set a Google Cloud billing budget alert and re-derive `GLOBAL_DAILY_MAX_REQUESTS` from the dollar figure in its comment **before** billing is enabled, never after.
 - **Swapping the placeholders** — the logo band, proof stats, and testimonials all ship with fixtures per section 11. Swapping them for real customers, numbers, and quotes is a tracked task, not a discovered surprise. Until it happens, every deploy report lists the outstanding `placeholder: true` hits.
-- **Closing CTA visual** — needs its own concept; must not be hands.
-- **The Glidda mark** — no wordmark or logo exists yet. The header currently needs a text-only wordmark in the Display face.
+- ~~**Closing CTA visual**~~ — **resolved 2026-07-26** (`prompts/14-closing-cta.md`): `components/sections/closing-cta.tsx` ends the page on the rail's terminus. Not hands.
+- **The Glidda mark** — the header's text-only wordmark exists (`components/layout/wordmark.tsx`), so the placeholder is no longer blocking. A real mark still does not exist. `components/layout/interchange-mark.tsx` is one section's illustration and says so in its own file comment — it is not the logo.
 - **Dark mode** — out of scope. The token set in 6.1 is light-only by design.
-- **`motion` package** — installed and unused. Either commit to GSAP alone and remove it, or document where each library is used.
+- ~~**`motion` package**~~ — **resolved 2026-07-28** (`prompts/20-repo-housekeeping.md`): removed. GSAP alone, per section 3.
 
 ---
 

@@ -7,13 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:responsive": "next build && node scripts/check-responsive.mts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@google/genai": "^2.13.0",
     "@gsap/react": "^2.1.2",
     "@shadcn/react": "^0.2.1",
+    "@upstash/redis": "^1.38.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -22,7 +24,6 @@
     "gsap": "^3.15.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^1.27.0",
-    "motion": "^12.42.2",
     "next": "16.2.12",
     "react": "19.2.4",
     "react-day-picker": "^10.0.1",
@@ -41,6 +42,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
+    "playwright-core": "^1.62.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
