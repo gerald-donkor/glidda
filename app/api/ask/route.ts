@@ -28,7 +28,10 @@ import { ask } from "@/lib/copy/shell"
 export const runtime = "nodejs"
 export const maxDuration = 30
 
-const MODEL = "gemini-3.6-flash"
+/** Chosen because it answers on the free tier: `gemini-3.6-flash` allows 20 requests a day there,
+ *  which cannot run a page-wide Ask bar. Revisit alongside the spend ceiling (§15) if billing is
+ *  ever enabled. */
+const MODEL = "gemini-3.5-flash"
 /** Response text only — thinking is budgeted separately by `thinking_level`. Answers are short by
  *  design, so this is a ceiling rather than a target. */
 const MAX_OUTPUT_TOKENS = 1024

@@ -244,3 +244,27 @@ npm run dev                  # http://localhost:3000
   billing.
 - **Whether the Ask bar should answer at all on a pre-launch page** — unchanged. The system
   prompt's rules are the mitigation; shipping it publicly is the user's call.
+
+---
+
+## Addendum — 2026-07-28: the model changed to `gemini-3.5-flash`
+
+Decision 2 above named `gemini-3.6-flash` and said not to substitute without asking. Asked and
+answered: the user chose to use a model that works on the free tier.
+
+**Why.** The key is on the free tier, where `gemini-3.6-flash` allows 20 requests a day
+(`generate_content_free_tier_requests, limit: 20`). That allowance was spent during this prompt's
+own verification, which is what kept acceptance criteria 1 and 6 open for two days. Twenty requests
+a day cannot run a page-wide Ask bar under any circumstances, so the ceiling — not the model — was
+the real constraint.
+
+`gemini-3.5-flash` answers on the same key, is present in the installed SDK's own model union, and
+is the model every grounding run has actually been performed against. Committing it makes the
+shipped code and the verified code the same thing for the first time.
+
+**What this does not resolve.** The free tier is still a ceiling, just a higher one. Enabling
+billing remains a prerequisite for a public deploy, and is the same decision as §15's spend
+ceiling.
+
+Everything else in this prompt stands: `api_version: "v1beta"`, `vertexai: false`, the
+`thinking_level`/`max_output_tokens` config, the error branches, and the grounding rules.
