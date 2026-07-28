@@ -1,8 +1,9 @@
 "use client"
 
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 
+import { useCapabilityRow } from "@/components/sections/capability-row-context"
 import type { Capability } from "@/lib/copy/capabilities"
 import { CAPABILITY, EASE } from "@/lib/gsap/motion"
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap/register"
@@ -29,7 +30,9 @@ import { cn, focusRing } from "@/lib/utils"
  */
 export function CapabilityAccordion({ rows }: { rows: Capability["rows"] }) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const [openIndex, setOpenIndex] = useState(0)
+  // Shared with the panel beside it, not local: the vignette illustrates the open row and swaps
+  // on this same beat (§5.2).
+  const { openIndex, setOpenIndex } = useCapabilityRow()
 
   /** The running sweep, so the pointer and scroll handlers can pause it without rebuilding it. */
   const timerRef = useRef<gsap.core.Tween | null>(null)

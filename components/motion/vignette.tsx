@@ -1,27 +1,32 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 
 import { Bubble, Chip, Cursor, Field, WireCard } from "@/components/motion/vignette-parts"
+import { useCapabilityRow } from "@/components/sections/capability-row-context"
 import type { VignetteCopy } from "@/lib/copy/placeholder/vignette"
 import {
   answersVignette,
   demosVignette,
   onboardingVignette,
 } from "@/lib/copy/placeholder/vignette"
-import { CAPABILITY, DURATION, EASE, STAGGER } from "@/lib/gsap/motion"
-import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap/register"
+import { CAPABILITY, DURATION, EASE, STAGGER, TESTIMONIAL } from "@/lib/gsap/motion"
+import { gsap, useGSAP } from "@/lib/gsap/register"
 
 /**
- * The looping vignette that floats over a capability panel's slipstream (§5.1, §7.3 #3).
+ * The vignette that floats over a capability panel's slipstream (§5.1, §7.3 #3).
  *
- * Two scenes, stacked. The first is the base layer and stays painted; the second crossfades in
- * over it, holds, and fades back out — which is what makes the loop seamless at its wrap, where a
- * fade-out-then-fade-in pair would blink the panel empty once a cycle.
+ * Three scenes, one per accordion row, and the panel shows the scene belonging to the sentence
+ * that is open. That coupling is measured, not assumed: in `ref/fullanimations.webm` the panel
+ * swaps on exactly the accordion's beat and illustrates the row that just opened.
  *
- * Its loop is deliberately **not** wired to the accordion beside it (§5.2, decision 5): the panel
- * should read as the product running continuously, not as an illustration of whichever sentence
- * happens to be open.
+ * It therefore owns no timer and no `ScrollTrigger` of its own. The accordion already holds its
+ * dwell on hover, on focus, and while the section is off-screen, and the panel inherits all three
+ * for free — the two can no longer drift out of sync because there is only one clock.
+ *
+ * At most two scenes are ever mounted: the open one, and the one it replaced, kept only so the
+ * swap has something to fade out. DOM order is always [outgoing, incoming], which is what lets
+ * `vignette-scene`'s `:not(:first-child)` rule supply both resting states with no JavaScript.
  *
  * Decorative and `aria-hidden` (§12) — its mock text would be noise in the accessibility tree, and
  * nothing in it is focusable. Every string comes from the flagged fixtures (§11.1); the visible
@@ -130,20 +135,45 @@ function AgentCardScene({ copy }: { copy: VignetteCopy }) {
   )
 }
 
-/** Scene one is the base layer; scene two crossfades over it. */
+/**
+ * One scene per accordion row, in row order (§5.1's table). Onboarding's mapping mirrors the
+ * reference's own sequence, and the row it ends on — following up on what stalled — is the one
+ * `onboardingVignette`'s "Day 3" fixture already reads as.
+ */
 function scenesFor(id: string, copy: VignetteCopy) {
   if (id === "demos") {
-    return [<TourScene key="a" copy={copy} />, <ChatScene key="b" copy={copy} choice={false} />]
+    return [
+      <TourScene key="drives" copy={copy} />,
+      <ChatScene key="adapts" copy={copy} choice={false} />,
+      <AgentCardScene key="hands-off" copy={copy} />,
+    ]
   }
   if (id === "onboarding") {
-    return [<AgentCardScene key="a" copy={copy} />, <TourScene key="b" copy={copy} />]
+    return [
+      <TourScene key="knows" copy={copy} />,
+      <AgentCardScene key="walks" copy={copy} />,
+      <InfoScene key="follows-up" copy={copy} />,
+    ]
   }
-  return [<ChatScene key="a" copy={copy} choice />, <InfoScene key="b" copy={copy} />]
+  return [
+    <ChatScene key="in-context" copy={copy} choice={false} />,
+    <ChatScene key="limits" copy={copy} choice />,
+    <InfoScene key="thread" copy={copy} />,
+  ]
 }
 
 export function Vignette({ capability }: { capability: "answers" | "demos" | "onboarding" }) {
   const rootRef = useRef<HTMLDivElement>(null)
   const copy = COPY[capability]
+  const { openIndex } = useCapabilityRow()
+
+  // The scene that is leaving, kept mounted only until the next swap. Derived from `openIndex`
+  // during render rather than in an effect, so the outgoing node is present in the same commit
+  // the incoming one arrives in and the crossfade never starts a frame late.
+  const [shown, setShown] = useState({ previous: -1, current: openIndex })
+  if (shown.current !== openIndex) {
+    setShown({ previous: shown.current, current: openIndex })
+  }
 
   useGSAP(
     () => {
@@ -151,8 +181,9 @@ export function Vignette({ capability }: { capability: "answers" | "demos" | "on
       if (!root) return
 
       const scenes = gsap.utils.toArray<HTMLElement>(root.querySelectorAll(".vignette-scene"))
-      const [base, overlay] = scenes
-      if (!base || !overlay) return
+      const incoming = scenes.at(-1)
+      const outgoing = scenes.length > 1 ? scenes[0] : null
+      if (!incoming) return
 
       const mm = gsap.matchMedia()
 
@@ -162,71 +193,76 @@ export function Vignette({ capability }: { capability: "answers" | "demos" | "on
           reduced: "(prefers-reduced-motion: reduce)",
         },
         (context) => {
-          // §7.2: the static first scene is already the reduced-motion state, so no timeline is
-          // built and nothing is left frozen mid-tween.
-          if (context.conditions?.reduced) return
+          // §7.2: the row still advances and the scene still swaps, at identical timing. Only the
+          // rise is dropped and the progress bar is set rather than swept — nothing is frozen
+          // mid-tween and nothing keeps moving.
+          const reduced = context.conditions?.reduced === true
 
-          const half = CAPABILITY.vignette / 2
-          const items = (scene: HTMLElement) =>
-            gsap.utils.toArray<HTMLElement>(scene.querySelectorAll("[data-item]"))
+          const timeline = gsap.timeline()
 
-          const master = gsap.timeline({
-            repeat: -1,
-            defaults: { duration: DURATION.entrance, ease: EASE.entrance },
-          })
+          if (outgoing) {
+            timeline.to(outgoing, { autoAlpha: 0, duration: DURATION.micro }, 0)
+          }
 
-          master.fromTo(
-            items(base),
-            { autoAlpha: 0, y: CAPABILITY.vignetteRise },
-            { autoAlpha: 1, y: 0, stagger: STAGGER },
-            0,
+          timeline.fromTo(
+            incoming,
+            { autoAlpha: 0 },
+            { autoAlpha: 1, duration: DURATION.entrance, ease: EASE.entrance },
+            // The same overlap the carousel's quote swap uses: short enough to hide the seam,
+            // short enough that the panel is never empty between two scenes.
+            TESTIMONIAL.overlap,
           )
 
-          const progress = base.querySelector("[data-progress]")
-          if (progress) {
-            master.fromTo(
-              progress,
-              { scaleX: 0.15 },
-              { scaleX: 0.85, duration: half, ease: EASE.loop },
-              0,
+          // Opacity is the scene's, never also the parts' — two fades multiply into a dimmer
+          // mid-flight frame. The parts carry the rise and nothing else.
+          const items = gsap.utils
+            .toArray<HTMLElement>(incoming.querySelectorAll("[data-item]"))
+            .slice(0, 6) // §7.1's cap. No scene has more; the slice is what keeps it true.
+
+          if (items.length > 0 && !reduced) {
+            timeline.fromTo(
+              items,
+              { y: CAPABILITY.vignetteRise },
+              {
+                y: 0,
+                duration: DURATION.entrance,
+                ease: EASE.entrance,
+                stagger: STAGGER,
+                clearProps: "transform",
+              },
+              TESTIMONIAL.overlap,
             )
           }
 
-          master
-            .fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1 }, half)
-            .fromTo(
-              items(overlay),
-              { autoAlpha: 0, y: CAPABILITY.vignetteRise },
-              { autoAlpha: 1, y: 0, stagger: STAGGER },
-              half,
-            )
-            .to(overlay, { autoAlpha: 0 }, CAPABILITY.vignette - DURATION.entrance)
-
-          // One ScrollTrigger, on the top-level timeline only — never on a nested child.
-          const trigger = ScrollTrigger.create({
-            trigger: root,
-            start: "top bottom",
-            end: "bottom top",
-            onToggle: ({ isActive }) => {
-              if (isActive) master.play()
-              else master.pause()
-            },
-          })
-
-          // onToggle only fires on a change, so a panel that mounts below the fold has to be
-          // paused explicitly.
-          if (!trigger.isActive) master.pause()
+          // The route's own progress, swept across the row's dwell so it lands as the accordion
+          // hands over. A scaleX bar — never an animated width (§7.1).
+          const progress = incoming.querySelector("[data-progress]")
+          if (progress) {
+            if (reduced) {
+              gsap.set(progress, { scaleX: 0.85 })
+            } else {
+              timeline.fromTo(
+                progress,
+                { scaleX: 0.15 },
+                { scaleX: 0.85, duration: CAPABILITY.dwell, ease: EASE.loop },
+                0,
+              )
+            }
+          }
         },
       )
 
       return () => mm.revert()
     },
-    { scope: rootRef },
+    { scope: rootRef, dependencies: [openIndex], revertOnUpdate: true },
   )
+
+  const scenes = scenesFor(capability, copy)
 
   return (
     <div ref={rootRef} aria-hidden className="absolute inset-0">
-      {scenesFor(capability, copy)}
+      {shown.previous !== -1 ? scenes[shown.previous] : null}
+      {scenes[shown.current]}
     </div>
   )
 }

@@ -55,8 +55,10 @@ export const HERO = {
  */
 export const CAPABILITY = {
   /** Accordion dwell per row, seconds. The underline's tween duration *is* the timer (§7.1), so
-   *  there is no second source of truth and no setTimeout racing a tween. */
-  dwell: 5,
+   *  there is no second source of truth and no setTimeout racing a tween. Measured off
+   *  `ref/fullanimations.webm`: 8.036, 8.035, 8.055, 7.984s across a 46s parked window, not an
+   *  estimate. Three rows, so a section's full cycle is 24s. */
+  dwell: 8,
   /** Row-body crossfade. */
   swap: DURATION.micro,
   /** px the row body rises through as it swaps in. */
@@ -64,12 +66,18 @@ export const CAPABILITY = {
   /** px of scrubbed carriage along the rail (§6.4). Small enough to read as the panel being
    *  carried by the line rather than as parallax decoration. */
   drift: 32,
-  /** One full vignette scene cycle, seconds — two scenes, so each holds for about half of it.
-   *  Inside §7.1's 8–20s ambient window, and deliberately coprime with SLIPSTREAM.durations so
-   *  the panel's scenes and its texture never lock into a visible beat. */
-  vignette: 13,
   /** px the vignette's parts rise through as their scene arrives. */
   vignetteRise: 8,
+} as const
+
+/**
+ * The logo band's marquee (§5.1). Speed, not duration: the track's width depends on the
+ * breakpoint and the loaded face, and a fixed duration would make the band visibly faster on
+ * mobile. Measured off `ref/fullanimations.webm` at ~17px/s leftward.
+ */
+export const MARQUEE = {
+  /** px per second, leftward. */
+  speed: 17,
 } as const
 
 /**

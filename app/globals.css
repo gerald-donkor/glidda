@@ -438,6 +438,45 @@
   }
 }
 
+/* The logo band's marquee window (§5.1). The edge fade is a mask, not an animated property, and
+   it matches the reference's partially faded names at both ends.
+
+   The track is moved by transform, so the window clips rather than scrolls — except in the two
+   cases where nothing moves it, reduced motion and no JavaScript, where a name past the right
+   edge would otherwise be unreachable at 360px. There the window becomes an ordinary horizontal
+   scroller inside its own box, which is what §12 asks for. Its scrollbar is hidden because the
+   fade already reads as "there is more here". */
+@utility marquee-window {
+  position: relative;
+  overflow: hidden;
+  --marquee-fade: linear-gradient(
+    to right,
+    transparent 0,
+    black 48px,
+    black calc(100% - 48px),
+    transparent 100%
+  );
+  -webkit-mask-image: var(--marquee-fade);
+  mask-image: var(--marquee-fade);
+
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+}
+
+/* The marquee's wrap copy. It exists only so the track can loop at `xPercent: -50` with no visible
+   seam, so it is absent in exactly the cases where nothing loops — reduced motion, and no
+   JavaScript — where it would otherwise read as fourteen customers instead of seven. Hidden from
+   the accessibility tree at all times regardless. */
+@utility marquee-wrap {
+  display: flex;
+
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    display: none;
+  }
+}
+
 /* For an affordance that can do nothing without JavaScript — it is absent rather than dead (§12).
    Costs no hydration and no state, unlike a feature check in an effect. */
 @utility scripting-only {
@@ -602,10 +641,12 @@
   min-height: 320px;
 }
 
-/* One vignette scene, stacked on its siblings so a crossfade shifts no layout. Every scene after
-   the first rests hidden, which is also the JavaScript-disabled and reduced-motion state (§7.2):
-   scene one renders, the rest stay out of the way. GSAP writes inline opacity, which beats this
-   regardless of cascade layer. */
+/* One vignette scene, stacked on its sibling so a crossfade shifts no layout. At most two are
+   mounted and their DOM order is always [outgoing, incoming], so this one rule supplies both
+   resting states: the scene on its way out is painted, the one arriving is not. It is also the
+   JavaScript-disabled state — with no script there is only ever one scene and it is the first
+   child, so it simply shows. GSAP writes inline opacity, which beats this regardless of cascade
+   layer. */
 @utility vignette-scene {
   position: absolute;
   inset: 0;

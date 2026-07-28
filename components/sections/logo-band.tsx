@@ -1,4 +1,5 @@
 import { PlaceholderChip } from "@/components/layout/placeholder-chip"
+import { LogoMarquee } from "@/components/motion/logo-marquee"
 import { Reveal } from "@/components/motion/reveal"
 import { companies } from "@/lib/copy/placeholder/companies"
 import { proofCopy } from "@/lib/copy/proof"
@@ -13,12 +14,13 @@ import { proofCopy } from "@/lib/copy/proof"
  * It also takes the tighter section rhythm, so the row reads as a continuation of the hero's
  * slipstream rather than as a new section separated by 400px of white.
  *
- * A single row only above 1280px, where the seven names measurably fit; a three- then two-column
- * grid below that. Not a marquee — §5.2 observed the reference's band as static, and a marquee is
- * an ambient loop, which §7.3 #4 is not.
+ * A marquee at every width, drifting left at a measured ~17px/s (§5.1). No breakpoint fallback and
+ * no grid: a track that scrolls already fits seven names at 360px, which is the whole reason the
+ * reference scrolls its band rather than wrapping it.
  *
  * The band arrives as one block, not as seven staggered names: §7.1 caps a stagger at six items
- * and there are seven, so the cap decides it.
+ * and there are seven, so the cap decides it. The marquee's own drift is ambient and starts
+ * independently of that arrival.
  */
 export function LogoBand() {
   return (
@@ -28,16 +30,7 @@ export function LogoBand() {
 
         <PlaceholderChip className="mb-10" />
 
-        <ul className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 sm:gap-x-8 xl:flex xl:justify-between xl:gap-x-8">
-          {companies.map((company) => (
-            <li
-              key={company.name}
-              className="type-display whitespace-nowrap text-panel text-ink"
-            >
-              {company.name}
-            </li>
-          ))}
-        </ul>
+        <LogoMarquee companies={companies} />
       </Reveal>
     </section>
   )

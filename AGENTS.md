@@ -122,7 +122,7 @@ Top to bottom, in scroll order:
 
 **3. Hero.** Center-aligned, and the most characteristic thing on the page. Two-line display headline at roughly 68–72px, tight leading (~0.95), a serif face. One line of small grey subcopy beneath. Then two buttons side by side: primary solid black pill with a small animated glyph on its left, secondary light-grey pill. Behind and below the buttons, a **continuously animating ribbon** spans edge to edge — a wide sine-like band with a grainy, dotted texture, painted in a warm amber that bleeds into a saturated blue at the wave's crossing points. It loops horizontally with a slow phase shift; over ~13s it visibly translates and re-forms, never resetting hard. It is the page's signature element and it overlaps both the CTA row and the logo band.
 
-**4. Logo band.** Seven customer wordmarks in a single evenly spaced row, all rendered flat near-black, sitting on top of the tail of the hero ribbon. Static in the recording — no marquee scroll observed.
+**4. Logo band.** Seven customer wordmarks in a single row, all rendered flat near-black, sitting on top of the tail of the hero ribbon. It is a **marquee**: the row drifts leftward at a measured ~17px/s, continuously, with a soft opacity fade at both edges so names arrive and leave rather than popping. (Corrected 2026-07-28 from "static — no marquee scroll observed", which was wrong; the velocity was measured off `ref/fullanimations.webm` by sampling one wordmark's x position across five frames.)
 
 **5. Proof band.** Hairline rule above. Left: two big-number stats, each a large figure with a two-line small-caps-ish grey label beside it. Right: a short customer quote in body size, with a small round avatar, name, and role right-aligned underneath. All on one row, no cards, no borders.
 
@@ -138,9 +138,9 @@ Top to bottom, in scroll order:
 | 2 | Demo agent | Give 1:1 demos at scale with an AI expert | left | greens |
 | 3 | Onboarding agent | Provide tailored onboarding with an AI guide | right | oranges |
 
-The text column has: a small pill eyebrow chip on a light grey fill, a two-line display headline, a large deliberate gap, then a **three-row accordion**. Each row is a plain sentence with a hairline rule under it; exactly one row is open at a time, revealing two lines of grey body copy. The open row also draws a **short accent underline that animates its width** — it acts as a progress bar for an auto-advance timer, so the accordion cycles on its own roughly every 4–5s and also responds to hover. Section 1's rows: engages visitors / qualifies leads / retains memory. Section 2: runs demo sessions / gathers insights / turns visitors into customers. Section 3: knows your product / navigates inside your UI / helps users reach goals.
+The text column has: a small pill eyebrow chip on a light grey fill, a two-line display headline, a large deliberate gap, then a **three-row accordion**. Each row is a plain sentence with a hairline rule under it; exactly one row is open at a time, revealing two lines of grey body copy. The open row also draws a **short accent underline that animates its width** — it acts as a progress bar for an auto-advance timer, so the accordion cycles on its own every **8.0s** (measured: 8.036, 8.035, 8.055, 7.984s across a 46s parked window) and also responds to hover. Section 1's rows: engages visitors / qualifies leads / retains memory. Section 2: runs demo sessions / gathers insights / turns visitors into customers. Section 3: knows your product / navigates inside your UI / helps users reach goals.
 
-The panel column is a tall rounded square (~1:1, ~500px) filled with an **animated grainy mesh gradient** in that section's hue — soft blobs that slowly morph and drift, heavy film grain over the top. Floating on it, a looping vignette that cycles two or three scenes:
+The panel column is a tall rounded square (~1:1, ~500px) filled with an **animated grainy mesh gradient** in that section's hue — soft blobs that slowly morph and drift, heavy film grain over the top. Floating on it, a vignette of three scenes — **one per accordion row, swapping on the same 8.0s beat**, so the panel always illustrates the sentence that is open. (Corrected 2026-07-28: this was previously recorded as an independent loop. At t≈111.75s the onboarding panel swaps from a "mapping the product" wireframe to a pointer-and-agent-card wireframe on exactly the beat the row *"navigates directly inside your UI"* opens.) The scenes:
 
 - *Chat scene:* alternating bubbles — visitor bubbles right-aligned white, agent bubbles left-aligned tinted and semi-transparent. Ends with a two-option choice row ("See demo" / "Skip") where the recommended option is a solid blue pill with a small agent avatar chip attached at its left edge.
 - *Visitor-info scene:* a header chip reading "Visitor info:" with an avatar, then five small white pills staggering in — company name, ARR, headcount, offering, goal.
@@ -171,7 +171,7 @@ Everything below was observed directly:
 - **Header buttons** — the black pill's background lightens slightly on hover; the "Sign in" link gains a pale rounded hover surface behind it, wider than the text.
 - **Hero ribbon** — animates on load and forever after, independent of scroll and of the cursor. No scroll-scrub, no mouse parallax.
 - **Logo band hover** — no state change.
-- **Feature accordions** — auto-advance on a timer with the accent underline as the progress indicator; hovering a closed row opens it immediately and takes over from the timer. The panel vignette runs its own independent loop and does *not* reset when the accordion row changes.
+- **Feature accordions** — auto-advance every 8.0s with the accent underline as the progress indicator; hovering a closed row opens it immediately and takes over from the timer. The panel vignette is **driven by the open row**: one scene per row, swapping on the same beat, whether the row changed by timer or by hover. (Corrected 2026-07-28 from the opposite claim — see §5.1.)
 - **Feature panels** — the mesh gradient morphs continuously. The vignette's "Chat with me…" input is focusable and typeable.
 - **Sections do not pin.** Scrolling is ordinary document scroll throughout. No scroll-jacking, no pinned panels, no smooth-scroll hijack.
 - **Generator input** — normal focus ring, accepts typing, adjacent button stays enabled.
@@ -194,6 +194,8 @@ The recording ends without submitting a message, so the post-submit conversation
 - the warm-off-white + serif-display + grainy-mesh look as a package
 
 If a prompt or a piece of generated copy would be recognisable as handhold.io with the name swapped, it is wrong. Glidda's identity is defined in section 6 and is deliberately different.
+
+**2026-07-28 — measured motion pass.** Three behaviours in 5.1 and 5.2 were re-derived from `ref/fullanimations.webm` with ffmpeg rather than by eye, and two of the statements they replaced were wrong: the logo band is a marquee, the panel vignette is driven by the open accordion row, and the accordion's dwell is 8.0s, not 4–5s (`prompts/22-reference-motion-conformance.md`). Those corrections are marked inline above. **The "leave" list in this section is unchanged and still binding** — the pass took timings and coupling, and no artwork, wordmark, logo, headline, quote, statistic, or copy came across with them.
 
 **2026-07-26 — approved structural revision.** The user supplied a full-page screenshot of handhold.io and approved a "same feel, our own values" rewrite of section 6 (`prompts/02-design-system-revision.md`). What was taken is structural only: a white page with a single tinted surface tone, monochrome page chrome, colour confined to the inside of feature panels, a two-step display scale, low density, black pill buttons, faint hairlines. The "leave" list above is unchanged and still binding — none of their values, faces, artwork, or copy came across.
 
@@ -306,8 +308,10 @@ Four, deliberately. Everything else is a 0.2s hover.
 
 1. **Hero load.** One timeline: the rail draws down from the top edge, the headline's two lines rise and fade in staggered, subcopy and CTAs follow, the slipstream fades up last and begins its loop. Under 1.2s total.
 2. **Rail progress.** Scroll-scrubbed for the whole page, as described in 6.4.
-3. **Panel vignettes.** Per-section looping timelines that play the scenes in 5.1, independent of the accordion's timer. Pause them when the section is off-screen.
+3. **Panel vignettes.** Per-section scenes that play the content in 5.1, **driven by the accordion's open row** — one scene per row, crossfading as the row changes (revised 2026-07-28, `prompts/22-reference-motion-conformance.md`). The vignette owns no timer and no `ScrollTrigger`: the accordion already holds its dwell on hover, on focus, and off-screen, so the panel inherits all three and the two cannot drift apart.
 4. **Section arrivals** (added 2026-07-28, `prompts/21-page-motion-pass.md`). Every section below the hero fades and rises 16px as it enters, once. One shared component — `components/motion/reveal.tsx` — never a per-section implementation. `top 85%`, `once: true`, `DURATION.entrance`, `EASE.entrance`, constants in `REVEAL`. **One reveal per section, not per element:** stagger only where a section has a genuine set of siblings and never beyond six (§7.1) — today that is the proof band and the build row, and nowhere else. Never applied to the rail, the slipstream, or a vignette, which already move. Reduced motion: the 16px offset drops to 0 and the fade stays, at identical timing. With JavaScript off the sections are simply visible — the hidden initial state lives inside `@media (scripting: enabled)` (§12), and getting that wrong is twelve blank sections, not a missing animation.
+
+The logo band's marquee is *not* a fifth moment. It is ambient texture in the same class as the slipstream — a continuous transform-only loop with no trigger, no sequence, and no arrival — and this clause is what says so, so the count above is unchanged.
 
 Anything beyond these four needs a reason stated in the prompt file. The bar for a fifth is the one argued in prompt 21: a category, not a section's decoration, and it must answer why the page is worse without it.
 
@@ -352,7 +356,7 @@ Mapping to the reference and what changes:
 | Announcement bar | same | Same shape and hover. Ours carries a product line, not a funding claim. |
 | Header | same | Not sticky; the rail carries continuity instead. |
 | Hero | same | Slipstream replaces the ribbon; headline hangs off the rail rather than centring. |
-| Logo band | same | Static row of seven fictional wordmarks set in the Display face — see section 11.2. |
+| Logo band | same | Same leftward marquee. Seven fictional wordmarks set in the Display face — see section 11.2. Ours also pauses on hover and on focus, and is static under reduced motion. |
 | Proof band | same | Same shape, placeholder figures. |
 | Live demo panel | demo block | Slipstream backdrop instead of the blurred bust. No floating spheres. |
 | Three capability sections | three feature sections | Same accordion + panel mechanic, our hues and slipstream texture, panels carried by the rail. |
