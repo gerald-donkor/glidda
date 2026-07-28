@@ -300,15 +300,16 @@ Motion is GSAP, always via `useGSAP` from `@gsap/react`, always scoped to a ref,
 
 Wrap every ambient or scroll-linked animation in `gsap.matchMedia()` with a `(prefers-reduced-motion: reduce)` branch. In that branch: the slipstream is a static gradient, the rail paints instantly to its final state, the accordion still auto-advances but without the underline sweep, the Ask bar placeholder shows one static string instead of typing, entrances become plain opacity fades. Nothing becomes unusable and nothing keeps moving.
 
-## 7.3 The three orchestrated moments
+## 7.3 The four orchestrated moments
 
-Three, deliberately. Everything else is a 0.2s hover.
+Four, deliberately. Everything else is a 0.2s hover.
 
 1. **Hero load.** One timeline: the rail draws down from the top edge, the headline's two lines rise and fade in staggered, subcopy and CTAs follow, the slipstream fades up last and begins its loop. Under 1.2s total.
 2. **Rail progress.** Scroll-scrubbed for the whole page, as described in 6.4.
 3. **Panel vignettes.** Per-section looping timelines that play the scenes in 5.1, independent of the accordion's timer. Pause them when the section is off-screen.
+4. **Section arrivals** (added 2026-07-28, `prompts/21-page-motion-pass.md`). Every section below the hero fades and rises 16px as it enters, once. One shared component — `components/motion/reveal.tsx` — never a per-section implementation. `top 85%`, `once: true`, `DURATION.entrance`, `EASE.entrance`, constants in `REVEAL`. **One reveal per section, not per element:** stagger only where a section has a genuine set of siblings and never beyond six (§7.1) — today that is the proof band and the build row, and nowhere else. Never applied to the rail, the slipstream, or a vignette, which already move. Reduced motion: the 16px offset drops to 0 and the fade stays, at identical timing. With JavaScript off the sections are simply visible — the hidden initial state lives inside `@media (scripting: enabled)` (§12), and getting that wrong is twelve blank sections, not a missing animation.
 
-Anything beyond these three needs a reason stated in the prompt file.
+Anything beyond these four needs a reason stated in the prompt file. The bar for a fifth is the one argued in prompt 21: a category, not a section's decoration, and it must answer why the page is worse without it.
 
 ---
 

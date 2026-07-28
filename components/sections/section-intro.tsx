@@ -1,3 +1,4 @@
+import { Reveal } from "@/components/motion/reveal"
 import { sectionIntro } from "@/lib/copy/section-intro"
 
 /**
@@ -14,10 +15,10 @@ import { sectionIntro } from "@/lib/copy/section-intro"
 export function SectionIntro() {
   return (
     <section id="capabilities" className="section-rhythm anchor-offset">
-      <div className="rail-offset relative">
+      <Reveal className="rail-offset relative">
         <h2 className="max-w-[20ch] text-headline">{sectionIntro.headline}</h2>
         <p className="mt-6 max-w-[62ch] text-body text-rail-muted">{sectionIntro.body}</p>
-      </div>
+      </Reveal>
     </section>
   )
 }

@@ -1,5 +1,6 @@
 import { PlaceholderChip } from "@/components/layout/placeholder-chip"
 import { RailStation } from "@/components/layout/rail-station"
+import { Reveal } from "@/components/motion/reveal"
 import { TestimonialCarousel } from "@/components/sections/testimonial-carousel"
 import { testimonials } from "@/lib/copy/testimonials"
 
@@ -18,7 +19,7 @@ import { testimonials } from "@/lib/copy/testimonials"
 export function Testimonials() {
   return (
     <section id="stories" className="section-rhythm anchor-offset">
-      <div className="rail-offset relative">
+      <Reveal className="rail-offset relative">
         <RailStation label={testimonials.station} />
 
         {/* The row reserves its height so turning the markers off reflows nothing. */}
@@ -28,7 +29,7 @@ export function Testimonials() {
         </div>
 
         <TestimonialCarousel />
-      </div>
+      </Reveal>
     </section>
   )
 }

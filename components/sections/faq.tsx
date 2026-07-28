@@ -1,4 +1,5 @@
 import { RailStation } from "@/components/layout/rail-station"
+import { Reveal } from "@/components/motion/reveal"
 import { FaqAccordion } from "@/components/sections/faq-accordion"
 import { faq } from "@/lib/copy/faq"
 
@@ -17,7 +18,7 @@ import { faq } from "@/lib/copy/faq"
 export function Faq() {
   return (
     <section id="faq" className="section-rhythm anchor-offset">
-      <div className="rail-offset relative">
+      <Reveal className="rail-offset relative">
         <RailStation label={faq.station} />
 
         {/* A label, not a heading — promoting it would put an h3 above its own h2. */}
@@ -28,7 +29,7 @@ export function Faq() {
         <div className="mt-[clamp(48px,6vw,72px)] max-w-[72ch]">
           <FaqAccordion rows={faq.rows} />
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

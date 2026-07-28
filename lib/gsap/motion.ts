@@ -73,7 +73,27 @@ export const CAPABILITY = {
 } as const
 
 /**
- * The testimonial carousel's quote swap (§8 row 11). Not a fourth orchestrated moment (§7.3) — a
+ * Section arrivals (§7.3 #4) — the one shared spec for every `<Reveal>` on the page.
+ *
+ * Deliberately quieter than the hero: 16px against `HERO.rise`'s 24, because the hero is the
+ * loudest thing on the page and a section below it must be quieter, not equal. Duration, ease,
+ * and stagger are the shared values above and are not restated here (§13).
+ */
+export const REVEAL = {
+  /** px, the entrance's y offset. Dropped to 0 in the reduced-motion branch (§7.2). */
+  rise: 16,
+  /** The trigger point: the element's top reaching 85% down the viewport. Deliberately not the
+   *  rail's `top center` — revealing at the midpoint means content appearing when it is already
+   *  half-read. */
+  start: "top 85%",
+  /** The station node's start scale. */
+  nodeScale: 0.6,
+  /** Seconds the node's tween precedes the section's content by, so the marker settles first. */
+  nodeLead: 0.08,
+} as const
+
+/**
+ * The testimonial carousel's quote swap (§8 row 11). Not an orchestrated moment (§7.3) — a
  * click-driven opacity change on one pair of elements, in the same class as `CAPABILITY.swap`.
  */
 export const TESTIMONIAL = {

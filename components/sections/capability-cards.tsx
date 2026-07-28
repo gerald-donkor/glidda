@@ -19,7 +19,11 @@ export function CapabilityCards() {
   return (
     <div className="flex flex-col gap-4">
       {buildGuide.cards.map((card) => (
-        <div key={card.heading} className="hairline rounded-card bg-surface p-6 sm:p-8">
+        <div
+          key={card.heading}
+          data-reveal-item
+          className="hairline rounded-card bg-surface p-6 sm:p-8"
+        >
           <h3 className="text-panel">{card.heading}</h3>
           <p className="mt-3 max-w-[42ch] text-body text-rail-muted">{card.line}</p>
         </div>

@@ -69,7 +69,7 @@ export function AskThread({
     { dependencies: [open], scope: panelRef }
   )
 
-  // The streaming indicator. A fourth ambient loop beyond §7.3's three, and the reason §7.3 asks
+  // The streaming indicator. An ambient loop outside §7.3's set, and the reason §7.3 asks
   // for: it is the only signal that the model is working before the first token arrives. Its
   // reduced-motion branch is a static element that communicates the same state.
   useGSAP(

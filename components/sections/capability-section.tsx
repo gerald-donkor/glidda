@@ -1,5 +1,6 @@
 import { PlaceholderChip } from "@/components/layout/placeholder-chip"
 import { RailStation } from "@/components/layout/rail-station"
+import { Reveal } from "@/components/motion/reveal"
 import type { SlipstreamRoute } from "@/components/motion/slipstream"
 import { CapabilityAccordion } from "@/components/sections/capability-accordion"
 import { CapabilityPanel } from "@/components/sections/capability-panel"
@@ -29,7 +30,7 @@ export function CapabilitySection({
 }) {
   return (
     <section id={capability.id} className="section-rhythm anchor-offset">
-      <div className="rail-offset relative">
+      <Reveal className="rail-offset relative">
         <RailStation label={capability.station} />
 
         <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
@@ -59,7 +60,7 @@ export function CapabilitySection({
             </div>
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

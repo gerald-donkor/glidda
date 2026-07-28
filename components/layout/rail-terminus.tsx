@@ -19,8 +19,10 @@
 export function RailTerminus({ label }: { label: string }) {
   return (
     <div aria-hidden className="rail-terminus pointer-events-none select-none">
-      {/* Not `node-square`: that is fixed at 7px and shared with the wordmark. */}
-      <span className="size-[11px] shrink-0 bg-ink" />
+      {/* Not `node-square`: that is fixed at 7px and shared with the wordmark. `data-reveal-node`
+          for the same reason `rail-station.tsx` carries it — the last stop arrives like every
+          other station (§7.3 #4), and it is the one marker it would be visible to leave out. */}
+      <span data-reveal-node className="size-[11px] shrink-0 bg-ink" />
       <span className="type-utility hidden whitespace-nowrap text-rail-muted sm:block">
         {label}
       </span>

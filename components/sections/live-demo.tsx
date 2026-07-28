@@ -1,4 +1,5 @@
 import { RailStation } from "@/components/layout/rail-station"
+import { Reveal } from "@/components/motion/reveal"
 import { Slipstream } from "@/components/motion/slipstream"
 import { Button } from "@/components/ui/button"
 import { liveDemo } from "@/lib/copy/live-demo"
@@ -8,8 +9,9 @@ import { liveDemo } from "@/lib/copy/live-demo"
  * eyebrow, a headline, one line of subcopy, and the solid ink pill.
  *
  * A server component: `Slipstream` is the only client boundary and it is imported, not authored
- * here. Nothing new animates (§7.3) — the drift below is the existing ambient loop, which starts
- * and pauses itself and already carries its own reduced-motion branch.
+ * here. No new ambient loop (§7.3) — the drift below is the existing one, which starts and pauses
+ * itself and already carries its own reduced-motion branch. The section's arrival is the shared
+ * `<Reveal>` (§7.3 #4), which this section does not configure.
  *
  * The fill is `--ground`, not `--surface`: `mono`'s streaks *are* `--surface`, so a surface fill
  * would render an invisible texture. The pale grey a reader sees is the streak field itself, and
@@ -21,7 +23,7 @@ import { liveDemo } from "@/lib/copy/live-demo"
 export function LiveDemo() {
   return (
     <section id="live-demo" className="section-rhythm anchor-offset">
-      <div className="rail-offset relative">
+      <Reveal className="rail-offset relative">
         <RailStation label={liveDemo.station} />
 
         {/* `Slipstream` is absolute, so this box supplies the positioning, the clip, and the
@@ -53,7 +55,7 @@ export function LiveDemo() {
             </div>
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

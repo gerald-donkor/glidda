@@ -1,4 +1,5 @@
 import { RailStation } from "@/components/layout/rail-station"
+import { Reveal } from "@/components/motion/reveal"
 import { EmbedPanel } from "@/components/sections/embed-panel"
 import { Button } from "@/components/ui/button"
 import { route } from "@/lib/copy/route"
@@ -9,8 +10,9 @@ import { route } from "@/lib/copy/route"
  *
  * The steps are stations on the page's own rail rather than free-floating numbers: each carries a
  * node on the line, so the rail's existing scroll paint travels through all three as the reader
- * passes them. That is why this section creates no motion of its own — the only scroll-linked
- * thing here is §7.3's second moment doing its job across new markers, not a fourth moment.
+ * passes them. That is why this section creates no motion of its own — the scroll-linked things
+ * here are §7.3's second moment doing its job across new markers and the shared arrival (#4),
+ * neither of which this section configures.
  *
  * A server component. The only client boundary in the section is `CopyEmbed`, three levels down.
  *
@@ -19,7 +21,7 @@ import { route } from "@/lib/copy/route"
 export function RouteSection() {
   return (
     <section id="route" className="section-rhythm anchor-offset">
-      <div className="rail-offset relative">
+      <Reveal className="rail-offset relative">
         <RailStation label={route.station} />
 
         {/* Both children carry `min-w-0`. A grid item's automatic minimum is its min-content
@@ -79,7 +81,7 @@ export function RouteSection() {
           {/* DOM order is text then panel at every width; the panel never reorders. */}
           <EmbedPanel />
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

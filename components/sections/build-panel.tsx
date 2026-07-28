@@ -20,7 +20,7 @@ import { buildGuide } from "@/lib/copy/build-guide"
  */
 export function BuildPanel() {
   return (
-    <div className="rounded-panel bg-surface p-5 sm:p-8 lg:p-10">
+    <div data-reveal-item className="rounded-panel bg-surface p-5 sm:p-8 lg:p-10">
       {/* A label, not a heading — promoting it would put an h3 above its own h2. */}
       <p className="type-utility text-rail-muted">{buildGuide.eyebrow}</p>
 

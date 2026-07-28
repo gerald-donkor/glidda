@@ -724,16 +724,17 @@
     line-height: 1.02;
   }
 
-  /* The hero load's initial state (§7.3 #1, §12).
+  /* The initial state of the hero load (§7.3 #1) and of every section arrival (§7.3 #4), §12.
      If the hidden state were unconditional CSS, a visitor with JavaScript disabled would get an
-     invisible hero. If GSAP applied it instead, the finished hero would paint and then jump,
-     because hydration runs after the first paint. `scripting: enabled` gives both: the rule
-     applies only where a script exists to undo it, and with JS off it never matches at all.
-     The hero's timeline therefore uses `fromTo`, not `from` — against `opacity: 0` a `from`
-     tween would animate 0 → 0 and the hero would never appear. The rail's half of this lives in
-     the `rail-lead` utility, for the cascade-layer reason documented there. */
+     invisible hero and twelve blank sections. If GSAP applied it instead, the finished content
+     would paint and then jump, because hydration runs after the first paint. `scripting: enabled`
+     gives both: the rule applies only where a script exists to undo it, and with JS off it never
+     matches at all. Both timelines therefore use `fromTo`, not `from` — against `opacity: 0` a
+     `from` tween would animate 0 → 0 and nothing would ever appear. The rail's half of this lives
+     in the `rail-lead` utility, for the cascade-layer reason documented there. */
   @media (scripting: enabled) {
-    [data-hero] {
+    [data-hero],
+    [data-reveal] {
       opacity: 0;
     }
   }

@@ -1,4 +1,5 @@
 import { PlaceholderChip } from "@/components/layout/placeholder-chip"
+import { Reveal } from "@/components/motion/reveal"
 import { companies } from "@/lib/copy/placeholder/companies"
 import { proofCopy } from "@/lib/copy/proof"
 
@@ -13,13 +14,16 @@ import { proofCopy } from "@/lib/copy/proof"
  * slipstream rather than as a new section separated by 400px of white.
  *
  * A single row only above 1280px, where the seven names measurably fit; a three- then two-column
- * grid below that. Not a marquee — §5.2 observed the reference's band as static, and §7.3 has no
- * room for a fourth animated moment.
+ * grid below that. Not a marquee — §5.2 observed the reference's band as static, and a marquee is
+ * an ambient loop, which §7.3 #4 is not.
+ *
+ * The band arrives as one block, not as seven staggered names: §7.1 caps a stagger at six items
+ * and there are seven, so the cap decides it.
  */
 export function LogoBand() {
   return (
     <section id="customers" className="section-rhythm-tight anchor-offset">
-      <div className="rail-offset relative">
+      <Reveal className="rail-offset relative">
         <h2 className="sr-only">{proofCopy.logoBandHeading}</h2>
 
         <PlaceholderChip className="mb-10" />
@@ -34,7 +38,7 @@ export function LogoBand() {
             </li>
           ))}
         </ul>
-      </div>
+      </Reveal>
     </section>
   )
 }

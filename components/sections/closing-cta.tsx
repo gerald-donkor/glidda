@@ -1,4 +1,5 @@
 import { RailTerminus } from "@/components/layout/rail-terminus"
+import { Reveal } from "@/components/motion/reveal"
 import { Button } from "@/components/ui/button"
 import { closingCta } from "@/lib/copy/closing-cta"
 
@@ -12,9 +13,9 @@ import { closingCta } from "@/lib/copy/closing-cta"
  * extent ends here. The arrival is a true statement about the page's geometry, not a metaphor, and
  * it needs no new artwork, image asset, or texture.
  *
- * Nothing animates (§7.3's three moments are spent). The moment a reader experiences is the rail's
- * existing scrubbed paint reaching the marker — so there is no tween here, and therefore no
- * reduced-motion branch to write.
+ * Nothing animates here beyond the shared arrival (§7.3 #4), which every section gets and none
+ * configures. The moment a reader experiences is the rail's existing scrubbed paint reaching the
+ * marker — so there is no tween in this file, and therefore no reduced-motion branch to write.
  *
  * Full-bleed by being a section background: the section is already viewport-wide, and `w-screen`
  * would add horizontal overflow equal to the scrollbar width (§12). No hairline — the fill is its
@@ -28,7 +29,7 @@ import { closingCta } from "@/lib/copy/closing-cta"
 export function ClosingCta() {
   return (
     <section id="start" className="section-rhythm anchor-offset bg-surface">
-      <div className="rail-offset relative">
+      <Reveal className="rail-offset relative">
         <RailTerminus label={closingCta.station} />
 
         <h2 className="max-w-[22ch] text-headline">{closingCta.headline}</h2>
@@ -43,7 +44,7 @@ export function ClosingCta() {
             {closingCta.cta.label}
           </Button>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

@@ -8,11 +8,15 @@
  * Below 640px the label is dropped and the node is kept (§6.4).
  *
  * `aria-hidden` — the label repeats the section's own heading and would double-announce (§12).
+ *
+ * `data-reveal-node` is the whole of this component's part in §7.3 #4: the marker is already
+ * inside its section's `<Reveal>`, so the section's own tween scales it in and this stays a server
+ * component.
  */
 export function RailStation({ label }: { label: string }) {
   return (
     <div aria-hidden className="rail-station pointer-events-none select-none">
-      <span className="node-square shrink-0" />
+      <span data-reveal-node className="node-square shrink-0" />
       <span className="type-utility hidden whitespace-nowrap text-rail-muted sm:block">
         {label}
       </span>

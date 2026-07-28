@@ -35,7 +35,7 @@ export function Bubble({ side, children }: { side: "visitor" | "agent"; children
 }
 
 /** A small label chip. `dot` marks it as a status line — the square node, not a spinner: a
- *  spinning glyph would be a fourth ambient loop and §7.3 does not have room for one. */
+ *  spinning glyph would be a new ambient loop, and §7.3's set is fixed. */
 export function Chip({
   children,
   dot = false,
